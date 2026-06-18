@@ -68,12 +68,12 @@ Tất cả nằm trong khối `const CONFIG = {…}` ở đầu thẻ `<script>`
 | Biến | Giá trị hiện tại | Ghi chú |
 |---|---|---|
 | `ENDPOINT` | (đã trỏ Apps Script) | **Không đổi** trừ khi deploy backend mới |
-| `TEACHER_PASSWORD` | `"doimatkhau123"` | 🔴 **BẮT BUỘC ĐỔI** trước khi dùng thật — đây là mật khẩu GV mở khóa khẩn cấp (Ctrl+Shift+U) |
+| `TEACHER_PASSWORD` | (đã đặt mật khẩu riêng) | Mật khẩu GV mở khóa khẩn cấp (Ctrl+Shift+U). Đã đổi khỏi mặc định; chủ sở hữu có thể đổi tiếp trong `index.html` |
 | `MIN_WORDS` | `120` | Số từ tối thiểu để nộp (0 = tắt) |
 | `TIME_LIMIT_MIN` | `30` | Thời gian làm bài (phút), 0 = không giới hạn |
 | `ONE_SUBMISSION_PER_EMAIL` | `true` | Mỗi email chỉ nộp 1 lần |
 
-🔴 **Việc bắt buộc trước khi công khai:** đổi `TEACHER_PASSWORD` thành mật khẩu riêng. (Lưu ý: mật khẩu này nằm ở phía client, ai xem mã nguồn trang đều thấy → chỉ là nút mở khóa tiện lợi, đừng trùng mật khẩu quan trọng.)
+> Lưu ý: `TEACHER_PASSWORD` nằm ở phía client, ai xem mã nguồn trang đều thấy → chỉ là nút mở khóa tiện lợi, đừng trùng mật khẩu quan trọng. (Đã đổi khỏi mặc định.)
 
 ---
 
@@ -206,7 +206,7 @@ Sửa code (Claude Code) → git push  →  trên server: git pull && systemctl 
 - [ ] Xác nhận → vào **fullscreen**, đồng hồ đếm ngược chạy.
 - [ ] Thử **Alt+Tab** → hiện cảnh báo đỏ + đếm vi phạm.
 - [ ] Gõ đủ từ → **Nộp** → có email về Gmail + 1 dòng trong tab `BaiNop`.
-- [ ] Đã **đổi `TEACHER_PASSWORD`**.
+- [x] Đã **đổi `TEACHER_PASSWORD`** khỏi mặc định.
 
 ---
 
