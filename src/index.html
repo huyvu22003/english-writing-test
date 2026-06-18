@@ -1,0 +1,801 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>IELTS Ms. TRÀ MY — English Writing Test</title>
+<style>
+  :root {
+    /* Tông thương hiệu IELTS Ms. TRÀ MY */
+    --bg: #7a2b8f;            /* tím thương hiệu — chỉnh cho khớp nền logo nếu cần */
+    --card: rgba(255,255,255,0.10);
+    --border: rgba(255,255,255,0.22);
+    --text: #ffffff;
+    --muted: rgba(255,255,255,0.72);
+    --accent: #f7941d;        /* cam (cánh hoa) */
+    --accent-red: #ec3a2b;    /* đỏ (cánh hoa) */
+    --grad: linear-gradient(135deg, #f7941d 0%, #ec3a2b 100%);
+    --danger: #ff5a4d;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    -webkit-user-select: none;
+    user-select: none;
+  }
+  .screen { width: 100%; max-width: 920px; display: none; position: relative; z-index: 1; }
+  .screen.active { display: block; }
+
+  /* ===== Trang trí nền: hào quang + lưới chấm + vòng tròn (hiện đại/công nghệ) ===== */
+  .bg-decor { position: fixed; inset: 0; z-index: 0; pointer-events: none; overflow: hidden; }
+  .bg-decor .glow { position: absolute; border-radius: 50%; filter: blur(90px); }
+  .bg-decor .glow.g1 { width: 460px; height: 460px; background: rgba(247,148,29,.28); left: -130px; top: 4%; }
+  .bg-decor .glow.g2 { width: 520px; height: 520px; background: rgba(236,58,43,.24); right: -150px; bottom: -8%; }
+  .bg-decor .glow.g3 { width: 320px; height: 320px; background: rgba(247,148,29,.15); right: 8%; top: -10%; }
+  .bg-decor .ring { position: absolute; border-radius: 50%; border: 1px solid rgba(255,255,255,.08); }
+  .bg-decor .ring.r1 { width: 540px; height: 540px; left: -180px; top: 10%; }
+  .bg-decor .ring.r2 { width: 340px; height: 340px; left: -70px; top: 34%; border-color: rgba(247,148,29,.16); }
+  .bg-decor .ring.r3 { width: 620px; height: 620px; right: -230px; bottom: -12%; }
+  .bg-decor .ring.r4 { width: 280px; height: 280px; right: -50px; top: 16%; border-color: rgba(236,58,43,.16); }
+  /* lưới chấm mảnh kiểu tech, mờ dần vào giữa để không chạm form */
+  .bg-decor .dots { position: absolute; inset: 0;
+    background-image: radial-gradient(rgba(255,255,255,.07) 1px, transparent 1.4px);
+    background-size: 28px 28px;
+    -webkit-mask-image: radial-gradient(ellipse 60% 70% at 50% 50%, transparent 45%, #000 80%);
+    mask-image: radial-gradient(ellipse 60% 70% at 50% 50%, transparent 45%, #000 80%);
+  }
+
+  /* ===== Logo thương hiệu (KHÔNG sửa — chỉ hiển thị ảnh nguyên bản) ===== */
+  .brand { text-align: center; margin-bottom: 20px; }
+  .brand-logo { width: 240px; max-width: 64%; height: auto; border-radius: 18px; display: inline-block; }
+  .logo-mini { height: 38px; width: auto; border-radius: 8px; display: block; }
+
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    padding: 40px;
+    box-shadow: 0 20px 60px rgba(0,0,0,.28);
+  }
+  h1 { font-size: 28px; margin-bottom: 8px; }
+  h2 { font-size: 20px; margin-bottom: 16px; color: var(--accent); }
+  p.sub { color: var(--muted); margin-bottom: 28px; line-height: 1.5; }
+
+  label { display: block; font-size: 14px; color: var(--muted); margin: 18px 0 6px; }
+  input[type="text"], input[type="email"], input[type="password"], select {
+    width: 100%;
+    padding: 14px 16px;
+    background: rgba(255,255,255,0.14);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    color: var(--text);
+    font-size: 16px;
+    outline: none;
+  }
+  input::placeholder { color: rgba(255,255,255,0.5); }
+  select option { color: #1a1a1a; }
+  input:focus, select:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(247,148,29,.25); }
+  select:disabled { opacity: .6; }
+
+  button {
+    cursor: pointer;
+    border: none;
+    border-radius: 10px;
+    font-size: 16px;
+    font-weight: 700;
+    padding: 14px 24px;
+    transition: transform .05s, opacity .2s, filter .2s;
+    color: #fff;
+  }
+  button:active { transform: translateY(1px); }
+  button:hover:not(:disabled) { filter: brightness(1.06); }
+  .btn-primary { background: var(--grad); width: 100%; margin-top: 28px; box-shadow: 0 8px 22px rgba(236,58,43,.35); }
+  .btn-submit { background: var(--grad); box-shadow: 0 8px 22px rgba(236,58,43,.35); }
+  .btn-ghost { background: transparent; color: var(--text); border: 1px solid var(--border); }
+  button:disabled { opacity: .5; cursor: not-allowed; }
+
+  .error { color: #ffd9d4; font-size: 14px; margin-top: 12px; min-height: 18px; font-weight: 600; }
+  .hint { color: var(--muted); font-size: 13px; margin-top: 6px; min-height: 16px; }
+
+  /* ===== Màn hình làm bài ===== */
+  #writeScreen .topbar {
+    display: flex; justify-content: space-between; align-items: center;
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 12px; padding: 12px 18px; margin-bottom: 16px;
+  }
+  .tb-left { display: flex; align-items: center; gap: 14px; }
+  .topbar .who { font-size: 14px; color: var(--muted); }
+  .topbar .who b { color: var(--text); }
+  .stats { display: flex; gap: 24px; align-items: center; font-size: 14px; }
+  .stat b { color: var(--accent); font-size: 18px; }
+  #timer.warn { color: var(--danger); }
+
+  .prompt-box {
+    background: var(--card); border: 1px solid var(--border);
+    border-left: 4px solid var(--accent);
+    border-radius: 12px; padding: 18px 20px; margin-bottom: 16px;
+    line-height: 1.55;
+  }
+  .prompt-box .tag { font-size: 12px; color: var(--accent); letter-spacing: .08em; text-transform: uppercase; font-weight: 700; }
+  .prompt-box .topic { font-size: 13px; color: var(--muted); margin-top: 4px; }
+
+  textarea {
+    width: 100%; min-height: 44vh;
+    background: rgba(255,255,255,0.96); border: 1px solid var(--border);
+    border-radius: 12px; padding: 20px; color: #1a1a1a;
+    font-size: 17px; line-height: 1.7; resize: none; outline: none;
+    -webkit-user-select: text; user-select: text;
+  }
+  textarea:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(247,148,29,.25); }
+
+  .bottombar { display: flex; justify-content: space-between; align-items: center; margin-top: 16px; }
+
+  /* ===== Overlay cảnh báo / khóa ===== */
+  .overlay {
+    position: fixed; inset: 0; background: rgba(58,18,71,.97);
+    display: none; align-items: center; justify-content: center;
+    z-index: 9999; text-align: center; padding: 32px;
+  }
+  .overlay.show { display: flex; }
+  .overlay .box { max-width: 560px; }
+  .overlay h2 { color: var(--danger); font-size: 26px; }
+  .overlay p { color: var(--text); margin: 14px 0; line-height: 1.6; }
+  .violation-count { font-size: 64px; font-weight: 800; color: var(--danger); margin: 10px 0; }
+
+  .pill { display:inline-block; background:rgba(255,255,255,0.12); border:1px solid var(--border); color:var(--muted);
+          padding:6px 12px; border-radius:999px; font-size:13px; }
+  .pill.warn { color:#fff; background:rgba(255,90,77,.25); border-color:var(--danger); font-weight:600; }
+  .center { text-align: center; }
+  .mt { margin-top: 24px; }
+  .success-icon { font-size: 64px; }
+
+  /* spinner nhỏ */
+  .spinner { display:inline-block; width:16px; height:16px; border:2px solid rgba(255,255,255,.4);
+             border-top-color: #fff; border-radius:50%; animation: spin .8s linear infinite;
+             vertical-align: middle; margin-right:8px; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+</style>
+</head>
+<body>
+
+<!-- ============ TRANG TRÍ NỀN (không tương tác) ============ -->
+<div class="bg-decor" aria-hidden="true">
+  <div class="dots"></div>
+  <div class="glow g1"></div>
+  <div class="glow g2"></div>
+  <div class="glow g3"></div>
+  <div class="ring r1"></div>
+  <div class="ring r2"></div>
+  <div class="ring r3"></div>
+  <div class="ring r4"></div>
+</div>
+
+<!-- ============ MÀN HÌNH 1: ĐĂNG NHẬP + CHỌN CHỦ ĐỀ ============ -->
+<section id="loginScreen" class="screen active">
+  <div class="brand">
+    <img class="brand-logo" src="logo.png" alt="IELTS Ms. TRÀ MY" onerror="this.style.display='none'" />
+  </div>
+  <div class="card">
+    <h1>English Writing Test</h1>
+    <p class="sub">Nhập thông tin, chọn chủ đề rồi bắt đầu. Sau khi bắt đầu, màn hình sẽ chuyển sang chế độ toàn màn hình và bị khóa cho đến khi bạn nộp bài.</p>
+
+    <label for="name">Họ và tên</label>
+    <input type="text" id="name" placeholder="Nguyen Van A" autocomplete="off" />
+
+    <label for="email">Email</label>
+    <input type="email" id="email" placeholder="email@example.com" autocomplete="off" />
+
+    <label for="topic">Chủ đề</label>
+    <select id="topic" disabled><option>Đang tải chủ đề...</option></select>
+    <div class="hint" id="topicHint"></div>
+
+    <div class="error" id="loginError"></div>
+    <button class="btn-primary" id="startBtn">Bắt đầu làm bài →</button>
+  </div>
+</section>
+
+<!-- ============ MÀN HÌNH 2: LÀM BÀI ============ -->
+<section id="writeScreen" class="screen">
+  <div class="topbar">
+    <div class="tb-left">
+      <img class="logo-mini" src="logo.png" alt="IELTS Ms. TRÀ MY" onerror="this.style.display='none'" />
+      <div class="who">Thí sinh: <b id="whoName">—</b></div>
+    </div>
+    <div class="stats">
+      <span class="stat">Số từ: <b id="wordCount">0</b></span>
+      <span class="stat">Thời gian: <b id="timer">--:--</b></span>
+    </div>
+  </div>
+
+  <div class="prompt-box">
+    <div class="tag">Đề bài / Writing prompt</div>
+    <div class="topic" id="promptTopic"></div>
+    <div id="promptText" style="margin-top:6px;"></div>
+  </div>
+
+  <textarea id="essay" placeholder="Type your answer here..." spellcheck="false"></textarea>
+
+  <div class="bottombar">
+    <span class="pill" id="minWordsHint"></span>
+    <button class="btn-submit" id="submitBtn">Nộp bài (Submit) ✓</button>
+  </div>
+</section>
+
+<!-- ============ MÀN HÌNH 3: HOÀN THÀNH ============ -->
+<section id="doneScreen" class="screen">
+  <div class="brand">
+    <img class="brand-logo" src="logo.png" alt="IELTS Ms. TRÀ MY" onerror="this.style.display='none'" />
+  </div>
+  <div class="card center">
+    <div class="success-icon">✅</div>
+    <h1 class="mt">Đã nộp bài thành công!</h1>
+    <p class="sub mt">Bài viết của bạn đã được gửi đến giáo viên. Bạn có thể đóng cửa sổ này.</p>
+  </div>
+</section>
+
+<!-- ============ OVERLAY: CẢNH BÁO RỜI MÀN HÌNH ============ -->
+<div class="overlay" id="warnOverlay">
+  <div class="box">
+    <h2>⚠️ CẢNH BÁO VI PHẠM</h2>
+    <p>Bạn vừa rời khỏi màn hình làm bài. Hành vi này đã được <b>ghi lại</b> và sẽ gửi cho giáo viên.</p>
+    <div class="violation-count" id="violationNum">0</div>
+    <p>lần vi phạm</p>
+    <button class="btn-primary" id="resumeBtn" style="max-width:320px;margin:24px auto 0;">Quay lại làm bài</button>
+  </div>
+</div>
+
+<!-- ============ OVERLAY: GIÁO VIÊN MỞ KHÓA ============ -->
+<div class="overlay" id="teacherOverlay">
+  <div class="box">
+    <h2 style="color:var(--accent)">🔑 Mở khóa dành cho giáo viên</h2>
+    <p>Nhập mật khẩu giáo viên để thoát chế độ khóa mà không nộp bài.</p>
+    <input type="password" id="teacherPass" placeholder="Mật khẩu" style="max-width:320px;margin:12px auto 0;" />
+    <div class="error" id="teacherError"></div>
+    <div class="mt" style="display:flex;gap:12px;justify-content:center;">
+      <button class="btn-ghost" id="teacherCancel">Hủy</button>
+      <button class="btn-primary" id="teacherUnlock" style="max-width:200px;">Mở khóa</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============ OVERLAY: XÁC NHẬN TRƯỚC KHI BẮT ĐẦU ============ -->
+<div class="overlay" id="confirmOverlay">
+  <div class="box">
+    <h2 style="color:var(--accent)">📋 Kiểm tra trước khi bắt đầu</h2>
+    <div style="background:rgba(255,255,255,.1);border:1px solid var(--border);border-radius:10px;padding:14px 16px;text-align:left;margin:8px 0 16px;line-height:1.8;">
+      <div>Họ tên: <b id="cfName"></b></div>
+      <div>Email: <b id="cfEmail"></b></div>
+      <div>Chủ đề: <b id="cfTopic"></b></div>
+    </div>
+    <p style="text-align:left">⚠️ Hãy <b>kiểm tra kỹ thông tin</b> ở trên. Khi đã bắt đầu, bài thi <b>không thể tạm dừng</b>. Trước khi nộp bài, mọi thao tác như <b>thu nhỏ, chuyển cửa sổ, thoát toàn màn hình</b> đều bị tính là <b>vi phạm</b> và bài làm có thể <b>không hợp lệ</b>.</p>
+    <p>Bạn đã sẵn sàng bắt đầu chưa?</p>
+    <div class="error" id="confirmError" style="text-align:center"></div>
+    <div class="mt" style="display:flex;gap:12px;justify-content:center;">
+      <button class="btn-ghost" id="confirmCancel">Hủy</button>
+      <button class="btn-primary" id="confirmStart" style="max-width:260px;">Xác nhận &amp; Bắt đầu</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* =====================================================================
+   CẤU HÌNH — Giáo viên chỉnh ở đây
+   ===================================================================== */
+const CONFIG = {
+  // URL Web App của Google Apps Script (xem docs/google-apps-script.md)
+  ENDPOINT: "https://script.google.com/macros/s/AKfycbyjfufremAP_XOYw-uT-RdRhERqknsm2Laena1mnExbWbAZFXxIDeY-oIvJqrPW09_0mA/exec",
+
+  // Mật khẩu để giáo viên mở khóa khẩn cấp (Ctrl+Shift+U). ĐỔI mật khẩu này!
+  TEACHER_PASSWORD: "doimatkhau123",
+
+  // Số từ tối thiểu mới cho nộp bài (0 = tắt)
+  MIN_WORDS: 120,
+
+  // Thời gian làm bài, tính bằng phút (0 = không giới hạn). Hết giờ tự nộp.
+  TIME_LIMIT_MIN: 30,
+
+  // Mỗi email chỉ được nộp 1 lần (true = bật). Tắt khi cho luyện tập nhiều lần.
+  ONE_SUBMISSION_PER_EMAIL: true,
+
+  // Chủ đề/đề bài dùng khi CHƯA cấu hình ENDPOINT (để chạy thử offline).
+  // Khi đã có ENDPOINT, danh sách này bị bỏ qua, app lấy đề từ Google Sheet.
+  FALLBACK_TOPICS: {
+    "topic-1": ["Write about the most memorable trip you have ever had (120-180 words)."],
+    "topic-2": ["Describe a hobby you enjoy and explain why it is important to you (120-180 words)."],
+    "topic-3": ["Write about a person who has influenced your life (120-180 words)."],
+    "topic-4": ["Describe your favourite place in your hometown and why you like it (120-180 words)."],
+    "topic-5": ["Do you think technology makes our lives better or worse? Give your opinion (120-180 words)."],
+    "topic-6": ["Write about your plans and dreams for the future (120-180 words)."],
+    "topic-7": ["Describe a book or film that you really enjoyed (120-180 words)."],
+    "topic-8": ["What does a healthy lifestyle mean to you? (120-180 words)."],
+    "topic-9": ["Write about an important event in your life and what you learned from it (120-180 words)."],
+    "topic-10": ["Should students wear school uniforms? Give your opinion (120-180 words)."],
+  },
+};
+
+/* ===================================================================== */
+
+const $ = (id) => document.getElementById(id);
+const screens = { login: $("loginScreen"), write: $("writeScreen"), done: $("doneScreen") };
+function show(name) {
+  Object.values(screens).forEach((s) => s.classList.remove("active"));
+  screens[name].classList.add("active");
+}
+function isConfigured() {
+  return CONFIG.ENDPOINT && !CONFIG.ENDPOINT.startsWith("PASTE_");
+}
+
+/* ---------- CHỐNG NỘP 2 LẦN CÙNG EMAIL ---------- */
+const SUBMITTED_KEY = "ewt_submitted_emails";
+function getUsedEmails() {
+  try { return JSON.parse(localStorage.getItem(SUBMITTED_KEY)) || []; } catch (e) { return []; }
+}
+function markEmailUsed(email) {
+  if (!email) return;
+  try {
+    const list = getUsedEmails();
+    const e = email.trim().toLowerCase();
+    if (!list.includes(e)) { list.push(e); localStorage.setItem(SUBMITTED_KEY, JSON.stringify(list)); }
+  } catch (e) {}
+}
+function isEmailUsedLocally(email) {
+  return getUsedEmails().includes(email.trim().toLowerCase());
+}
+// Trả true nếu email đã nộp bài (chặn không cho làm lại).
+async function isEmailBlocked(email) {
+  if (!CONFIG.ONE_SUBMISSION_PER_EMAIL) return false;
+  if (isEmailUsedLocally(email)) return true;        // lớp phụ: nhanh + offline
+  if (isConfigured()) {                               // lớp chính: hỏi server (sheet BaiNop)
+    try {
+      const res = await jsonp({ action: "check", email });
+      if (res && res.submitted) return true;
+    } catch (e) { /* lỗi mạng: không chặn để tránh kẹt thí sinh hợp lệ */ }
+  }
+  return false;
+}
+
+const state = {
+  name: "", email: "",
+  topic: "", prompt: "",
+  startedAt: null,
+  violations: 0,
+  log: [],            // nhật ký sự kiện gian lận
+  locked: false,      // đang ở chế độ khóa hay không
+  submitted: false,
+  timerId: null,
+  secondsLeft: 0,
+};
+
+function nowStr() {
+  return new Date().toLocaleTimeString("vi-VN", { hour12: false });
+}
+function logEvent(msg) {
+  state.log.push(`[${nowStr()}] ${msg}`);
+}
+
+/* ---------- JSONP: tải dữ liệu từ Google Apps Script (tránh lỗi CORS) ---------- */
+function jsonp(params) {
+  return new Promise((resolve, reject) => {
+    const cb = "jsonp_" + Math.random().toString(36).slice(2);
+    const script = document.createElement("script");
+    const timer = setTimeout(() => { cleanup(); reject(new Error("timeout")); }, 15000);
+    function cleanup() {
+      delete window[cb];
+      if (script.parentNode) script.parentNode.removeChild(script);
+      clearTimeout(timer);
+    }
+    window[cb] = (data) => { cleanup(); resolve(data); };
+    const qs = new URLSearchParams({ ...params, callback: cb }).toString();
+    script.src = CONFIG.ENDPOINT + (CONFIG.ENDPOINT.includes("?") ? "&" : "?") + qs;
+    script.onerror = () => { cleanup(); reject(new Error("network")); };
+    document.head.appendChild(script);
+  });
+}
+
+/* ---------- TẢI DANH SÁCH CHỦ ĐỀ KHI MỞ APP ---------- */
+async function loadTopics() {
+  const sel = $("topic");
+  const hint = $("topicHint");
+
+  if (!isConfigured()) {
+    fillTopics(Object.keys(CONFIG.FALLBACK_TOPICS));
+    hint.textContent = "(Chế độ thử offline — chưa cấu hình Google Sheet)";
+    return;
+  }
+  try {
+    const res = await jsonp({ action: "topics" });
+    const topics = (res && res.topics) || [];
+    if (!topics.length) {
+      sel.innerHTML = "<option>(Chưa có chủ đề nào trong Sheet)</option>";
+      hint.textContent = "Giáo viên hãy tạo tab chủ đề trong Google Sheet.";
+      return;
+    }
+    fillTopics(topics);
+    hint.textContent = "";
+  } catch (e) {
+    sel.innerHTML = "<option>(Lỗi tải chủ đề)</option>";
+    hint.textContent = "Không tải được danh sách chủ đề. Kiểm tra ENDPOINT/kết nối mạng.";
+  }
+}
+function fillTopics(list) {
+  const sel = $("topic");
+  sel.innerHTML = "";
+  list.forEach((t) => {
+    const o = document.createElement("option");
+    o.value = t; o.textContent = t;
+    sel.appendChild(o);
+  });
+  sel.disabled = false;
+}
+
+/* ---------- LẤY ĐỀ BÀI THEO CHỦ ĐỀ ---------- */
+async function fetchPrompt(topic) {
+  if (!isConfigured()) {
+    const arr = CONFIG.FALLBACK_TOPICS[topic] || ["(Không có đề)"];
+    return arr[Math.floor(Math.random() * arr.length)];
+  }
+  const res = await jsonp({ action: "prompt", topic });
+  if (!res || !res.prompt) throw new Error("empty");
+  return res.prompt;
+}
+
+/* ---------- MÀN HÌNH ĐĂNG NHẬP ---------- */
+// Bước 1: bấm "Bắt đầu" -> chỉ validate rồi hiện popup nhắc nhở + xác nhận.
+$("startBtn").addEventListener("click", () => {
+  const name = $("name").value.trim();
+  const email = $("email").value.trim();
+  const topic = $("topic").value;
+  const err = $("loginError");
+  err.textContent = "";
+
+  if (name.length < 2) { err.textContent = "Vui lòng nhập họ tên hợp lệ."; return; }
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { err.textContent = "Email không hợp lệ."; return; }
+  if (!topic || $("topic").disabled) { err.textContent = "Vui lòng chọn chủ đề."; return; }
+
+  // Đổ thông tin vào popup để thí sinh kiểm tra lại
+  $("cfName").textContent = name;
+  $("cfEmail").textContent = email;
+  $("cfTopic").textContent = topic;
+  $("confirmError").textContent = "";
+  $("confirmStart").disabled = false;
+  $("confirmStart").innerHTML = "Xác nhận &amp; Bắt đầu";
+  $("confirmOverlay").classList.add("show");
+});
+
+// Hủy: đóng popup, quay lại sửa thông tin.
+$("confirmCancel").addEventListener("click", () => $("confirmOverlay").classList.remove("show"));
+
+// Bước 2: bấm "Xác nhận & Bắt đầu" -> kiểm tra email, tải đề, vào chế độ khóa.
+// (Click này là user-gesture nên requestFullscreen kích hoạt đáng tin cậy.)
+$("confirmStart").addEventListener("click", async () => {
+  const name = $("name").value.trim();
+  const email = $("email").value.trim();
+  const topic = $("topic").value;
+  const cErr = $("confirmError");
+  cErr.textContent = "";
+
+  const cbtn = $("confirmStart");
+  cbtn.disabled = true;
+  cbtn.innerHTML = '<span class="spinner"></span>Đang kiểm tra...';
+
+  // Chặn nếu email này đã nộp bài (giới hạn 1 lần/email)
+  if (await isEmailBlocked(email)) {
+    cErr.textContent = "Email này đã làm và nộp bài rồi. Mỗi email chỉ được làm 1 lần.";
+    cbtn.disabled = false; cbtn.innerHTML = "Xác nhận &amp; Bắt đầu";
+    return;
+  }
+
+  cbtn.innerHTML = '<span class="spinner"></span>Đang tải đề...';
+  let prompt;
+  try {
+    prompt = await fetchPrompt(topic);
+  } catch (e) {
+    cErr.textContent = "Không tải được đề bài cho chủ đề này. Thử lại.";
+    cbtn.disabled = false; cbtn.innerHTML = "Xác nhận &amp; Bắt đầu";
+    return;
+  }
+
+  state.name = name;
+  state.email = email;
+  state.topic = topic;
+  state.prompt = prompt;
+  state.startedAt = new Date();
+
+  $("whoName").textContent = name;
+  $("promptTopic").textContent = "Chủ đề: " + topic;
+  $("promptText").textContent = prompt;
+  $("minWordsHint").textContent = CONFIG.MIN_WORDS > 0
+    ? `Tối thiểu ${CONFIG.MIN_WORDS} từ để được nộp` : "Không giới hạn số từ";
+
+  $("confirmOverlay").classList.remove("show");
+  show("write");
+  startTimer();
+  logEvent(`Bắt đầu làm bài — chủ đề: ${topic}`);
+  saveSession();
+  $("essay").focus();
+  // Không await: nếu trình duyệt chặn/treo fullscreen, timer & bài làm vẫn chạy bình thường.
+  enterLockdown();
+});
+
+/* ---------- CHẾ ĐỘ KHÓA (FULLSCREEN + CHẶN PHÍM) ---------- */
+async function enterLockdown() {
+  state.locked = true;
+  try {
+    await document.documentElement.requestFullscreen();
+  } catch (e) {
+    logEvent("Không vào được fullscreen (trình duyệt chặn)");
+  }
+}
+
+document.addEventListener("fullscreenchange", () => {
+  if (!state.locked || state.submitted) return;
+  if (!document.fullscreenElement) {
+    registerViolation("Thoát toàn màn hình (Esc/F11)");
+  }
+});
+
+window.addEventListener("blur", () => {
+  if (state.locked && !state.submitted) registerViolation("Rời cửa sổ làm bài (Alt+Tab/đổi ứng dụng)");
+});
+document.addEventListener("visibilitychange", () => {
+  if (document.hidden && state.locked && !state.submitted)
+    registerViolation("Chuyển sang tab/cửa sổ khác");
+});
+
+// Khi app tự mở hộp thoại (alert/confirm), cửa sổ mất focus -> KHÔNG tính là vi phạm.
+let suppressViolations = false;
+function guardDialog(fn) {
+  suppressViolations = true;
+  try { return fn(); }
+  finally { setTimeout(function () { suppressViolations = false; }, 500); }
+}
+
+let lastViolationAt = 0;
+function registerViolation(reason) {
+  if (suppressViolations) return; // bỏ qua blur do hộp thoại của chính app gây ra
+  // Gộp các sự kiện sinh đôi (blur + visibilitychange) của cùng 1 hành động:
+  // trong vòng 800ms chỉ tính 1 vi phạm.
+  const now = Date.now();
+  if (now - lastViolationAt < 800) return;
+  lastViolationAt = now;
+
+  state.violations++;
+  logEvent(`⚠️ VI PHẠM #${state.violations}: ${reason}`);
+  $("violationNum").textContent = state.violations;
+  $("warnOverlay").classList.add("show");
+  saveSession();
+}
+
+$("resumeBtn").addEventListener("click", async () => {
+  $("warnOverlay").classList.remove("show");
+  if (!document.fullscreenElement) {
+    try { await document.documentElement.requestFullscreen(); } catch (e) {}
+  }
+  $("essay").focus();
+});
+
+document.addEventListener("keydown", (e) => {
+  if (!state.locked || state.submitted) return;
+
+  // Tổ hợp giáo viên mở khóa: Ctrl + Shift + U
+  if (e.ctrlKey && e.shiftKey && (e.key === "U" || e.key === "u")) {
+    e.preventDefault();
+    openTeacherUnlock();
+    return;
+  }
+
+  const k = e.key;
+  if (k === "F12" || k === "F11") { e.preventDefault(); return; }
+  if (e.ctrlKey && ["c","v","x","p","s","u","C","V","X","P","S","U"].includes(k)) {
+    e.preventDefault();
+    logEvent(`Chặn phím tắt Ctrl+${k.toUpperCase()}`);
+    return;
+  }
+  if (e.ctrlKey && e.shiftKey && ["I","J","C","i","j","c"].includes(k)) {
+    e.preventDefault(); return;
+  }
+});
+
+["contextmenu","copy","cut","paste"].forEach((ev) => {
+  document.addEventListener(ev, (e) => {
+    if (state.locked && !state.submitted) {
+      e.preventDefault();
+      logEvent(`Chặn thao tác: ${ev}`);
+    }
+  });
+});
+
+window.addEventListener("beforeunload", (e) => {
+  if (state.locked && !state.submitted) { e.preventDefault(); e.returnValue = ""; }
+});
+
+/* ---------- GIÁO VIÊN MỞ KHÓA ---------- */
+function openTeacherUnlock() {
+  $("teacherPass").value = "";
+  $("teacherError").textContent = "";
+  $("teacherOverlay").classList.add("show");
+  $("teacherPass").focus();
+}
+$("teacherCancel").addEventListener("click", () => $("teacherOverlay").classList.remove("show"));
+$("teacherUnlock").addEventListener("click", () => {
+  if ($("teacherPass").value === CONFIG.TEACHER_PASSWORD) {
+    logEvent("Giáo viên mở khóa thủ công");
+    state.locked = false;
+    $("teacherOverlay").classList.remove("show");
+    $("warnOverlay").classList.remove("show");
+    if (document.fullscreenElement) document.exitFullscreen().catch(() => {});
+    guardDialog(() => alert("Đã mở khóa. Bài làm CHƯA được nộp."));
+  } else {
+    $("teacherError").textContent = "Sai mật khẩu.";
+  }
+});
+
+/* ---------- ĐẾM TỪ ---------- */
+$("essay").addEventListener("input", () => {
+  const w = getWordCount();
+  $("wordCount").textContent = w;
+  // Đang hiện cảnh báo thiếu từ mà giờ đã đủ -> trả lại gợi ý bình thường
+  const hint = $("minWordsHint");
+  if (hint.classList.contains("warn") && (CONFIG.MIN_WORDS <= 0 || w >= CONFIG.MIN_WORDS)) {
+    hint.classList.remove("warn");
+    hint.textContent = CONFIG.MIN_WORDS > 0
+      ? `Tối thiểu ${CONFIG.MIN_WORDS} từ để được nộp` : "Không giới hạn số từ";
+  }
+  saveSession();
+});
+function getWordCount() {
+  return $("essay").value.trim().split(/\s+/).filter(Boolean).length;
+}
+
+/* ---------- TỰ ĐỘNG LƯU NHÁP (chống mất bài khi reload) ---------- */
+const STORAGE_KEY = "ewt_session";
+
+function saveSession() {
+  if (state.submitted || !state.startedAt) return;
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify({
+      name: state.name,
+      email: state.email,
+      topic: state.topic,
+      prompt: state.prompt,
+      essay: $("essay").value,
+      startedAt: state.startedAt.getTime(),
+      violations: state.violations,
+      log: state.log,
+      secondsLeft: state.secondsLeft,
+    }));
+  } catch (e) { /* localStorage có thể bị chặn — bỏ qua */ }
+}
+function clearSession() {
+  try { localStorage.removeItem(STORAGE_KEY); } catch (e) {}
+}
+
+// Khôi phục phiên làm bài còn dang dở (sau khi reload / đóng nhầm tab).
+function tryRestore() {
+  let data;
+  try { data = JSON.parse(localStorage.getItem(STORAGE_KEY)); } catch (e) { return false; }
+  if (!data || !data.name) return false;
+
+  state.name = data.name;
+  state.email = data.email;
+  state.topic = data.topic;
+  state.prompt = data.prompt;
+  state.startedAt = new Date(data.startedAt || Date.now());
+  state.violations = data.violations || 0;
+  state.log = Array.isArray(data.log) ? data.log : [];
+
+  $("whoName").textContent = state.name;
+  $("promptTopic").textContent = "Chủ đề: " + state.topic;
+  $("promptText").textContent = state.prompt;
+  $("essay").value = data.essay || "";
+  $("wordCount").textContent = getWordCount();
+  $("violationNum").textContent = state.violations;
+  $("minWordsHint").textContent = CONFIG.MIN_WORDS > 0
+    ? `Tối thiểu ${CONFIG.MIN_WORDS} từ để được nộp` : "Không giới hạn số từ";
+
+  show("write");
+  logEvent("Tải lại trang khi đang làm bài (đã khôi phục)");
+  startTimer(data.secondsLeft);
+  registerViolation("Tải lại / mở lại trang khi đang làm bài");
+  $("essay").focus();
+  enterLockdown();
+  return true;
+}
+
+/* ---------- ĐỒNG HỒ ---------- */
+function startTimer(resumeSeconds) {
+  if (CONFIG.TIME_LIMIT_MIN <= 0) { $("timer").textContent = "∞"; return; }
+  state.secondsLeft = (typeof resumeSeconds === "number" && resumeSeconds > 0)
+    ? resumeSeconds : CONFIG.TIME_LIMIT_MIN * 60;
+  renderTimer();
+  state.timerId = setInterval(() => {
+    state.secondsLeft--;
+    renderTimer();
+    saveSession(); // lưu nháp định kỳ để khôi phục đúng thời gian còn lại
+    if (state.secondsLeft <= 0) {
+      clearInterval(state.timerId);
+      logEvent("Hết giờ — tự động nộp bài");
+      doSubmit(true);
+    }
+  }, 1000);
+}
+function renderTimer() {
+  const m = Math.floor(state.secondsLeft / 60);
+  const s = state.secondsLeft % 60;
+  $("timer").textContent = `${String(m).padStart(2,"0")}:${String(s).padStart(2,"0")}`;
+  $("timer").classList.toggle("warn", state.secondsLeft <= 60);
+}
+
+/* ---------- NỘP BÀI ---------- */
+$("submitBtn").addEventListener("click", () => doSubmit(false));
+
+async function doSubmit(auto) {
+  const words = getWordCount();
+  if (!auto && CONFIG.MIN_WORDS > 0 && words < CONFIG.MIN_WORDS) {
+    // KHÔNG dùng alert (gây blur -> vi phạm giả). Hiện thông báo ngay tại chỗ.
+    const hint = $("minWordsHint");
+    hint.textContent = `⚠️ Chưa đủ ${CONFIG.MIN_WORDS} từ — bạn mới viết ${words} từ.`;
+    hint.classList.add("warn");
+    return;
+  }
+  if (!auto && !guardDialog(() => confirm("Bạn chắc chắn muốn nộp bài? Sau khi nộp sẽ không sửa được."))) return;
+
+  $("submitBtn").disabled = true;
+  $("submitBtn").textContent = "Đang gửi...";
+  logEvent("Nộp bài");
+
+  const payload = {
+    name: state.name,
+    email: state.email,
+    topic: state.topic,
+    prompt: state.prompt,
+    essay: $("essay").value,
+    wordCount: words,
+    startedAt: state.startedAt.toLocaleString("vi-VN"),
+    submittedAt: new Date().toLocaleString("vi-VN"),
+    violations: state.violations,
+    log: state.log.join("\n"),
+  };
+
+  try {
+    await sendToBackend(payload);
+  } catch (e) {
+    console.error(e);
+  }
+
+  state.submitted = true;
+  state.locked = false;
+  if (state.timerId) clearInterval(state.timerId);
+  markEmailUsed(state.email); // ghi nhận email đã nộp (chặn làm lại)
+  clearSession(); // xóa nháp đã lưu, tránh khôi phục nhầm sau khi đã nộp
+  if (document.fullscreenElement) document.exitFullscreen().catch(() => {});
+  show("done");
+}
+
+async function sendToBackend(payload) {
+  if (!isConfigured()) {
+    console.warn("Chưa cấu hình ENDPOINT — bỏ qua gửi. Payload:", payload);
+    return;
+  }
+  // Dùng text/plain + no-cors để tránh lỗi CORS khi POST tới Google Apps Script
+  await fetch(CONFIG.ENDPOINT, {
+    method: "POST",
+    mode: "no-cors",
+    headers: { "Content-Type": "text/plain;charset=utf-8" },
+    body: JSON.stringify(payload),
+  });
+}
+
+/* ---------- KHỞI ĐỘNG ---------- */
+// Ưu tiên khôi phục phiên dang dở; nếu không có thì tải danh sách chủ đề.
+if (!tryRestore()) loadTopics();
+</script>
+</body>
+</html>

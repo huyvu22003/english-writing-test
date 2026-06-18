@@ -1,0 +1,19 @@
+# Môi trường & bí mật
+.env
+.env.local
+*.local
+
+# Hệ điều hành
+Thumbs.db
+.DS_Store
+
+# Editor
+.vscode/
+.idea/
+
+# Kết quả tạm (không cần đưa lên repo)
+outputs/*
+!outputs/.gitkeep
+
+# Node (nếu sau này thêm)
+node_modules/
