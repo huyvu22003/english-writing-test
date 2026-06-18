@@ -447,8 +447,9 @@ async function fetchPrompt(topic) {
 }
 
 /* ---------- MÀN HÌNH ĐĂNG NHẬP ---------- */
-// Bước 1: bấm "Bắt đầu" -> chỉ validate rồi hiện popup nhắc nhở + xác nhận.
-$("startBtn").addEventListener("click", () => {
+// Bước 1: bấm "Bắt đầu" -> validate + kiểm tra email + TẢI ĐỀ SẴN (async) rồi mới hiện popup.
+// Làm hết phần async ở đây để bước "Xác nhận" không còn await -> requestFullscreen chạy được.
+$("startBtn").addEventListener("click", async () => {
   const name = $("name").value.trim();
   const email = $("email").value.trim();
   const topic = $("topic").value;
@@ -459,69 +460,63 @@ $("startBtn").addEventListener("click", () => {
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { err.textContent = "Email không hợp lệ."; return; }
   if (!topic || $("topic").disabled) { err.textContent = "Vui lòng chọn chủ đề."; return; }
 
-  // Đổ thông tin vào popup để thí sinh kiểm tra lại
+  const btn = $("startBtn");
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span>Đang kiểm tra...';
+
+  // Chặn nếu email này đã nộp bài (giới hạn 1 lần/email)
+  if (await isEmailBlocked(email)) {
+    err.textContent = "Email này đã làm và nộp bài rồi. Mỗi email chỉ được làm 1 lần.";
+    btn.disabled = false; btn.textContent = "Bắt đầu làm bài →";
+    return;
+  }
+
+  btn.innerHTML = '<span class="spinner"></span>Đang tải đề...';
+  let prompt;
+  try {
+    prompt = await fetchPrompt(topic);
+  } catch (e) {
+    err.textContent = "Không tải được đề bài cho chủ đề này. Thử lại.";
+    btn.disabled = false; btn.textContent = "Bắt đầu làm bài →";
+    return;
+  }
+
+  // Lưu tạm cho bước xác nhận (đề đã tải sẵn -> xác nhận không cần await)
+  state.name = name;
+  state.email = email;
+  state.topic = topic;
+  state.prompt = prompt;
+
   $("cfName").textContent = name;
   $("cfEmail").textContent = email;
   $("cfTopic").textContent = topic;
   $("confirmError").textContent = "";
-  $("confirmStart").disabled = false;
-  $("confirmStart").innerHTML = "Xác nhận &amp; Bắt đầu";
   $("confirmOverlay").classList.add("show");
+
+  btn.disabled = false; btn.textContent = "Bắt đầu làm bài →";
 });
 
 // Hủy: đóng popup, quay lại sửa thông tin.
 $("confirmCancel").addEventListener("click", () => $("confirmOverlay").classList.remove("show"));
 
-// Bước 2: bấm "Xác nhận & Bắt đầu" -> kiểm tra email, tải đề, vào chế độ khóa.
-// (Click này là user-gesture nên requestFullscreen kích hoạt đáng tin cậy.)
-$("confirmStart").addEventListener("click", async () => {
-  const name = $("name").value.trim();
-  const email = $("email").value.trim();
-  const topic = $("topic").value;
-  const cErr = $("confirmError");
-  cErr.textContent = "";
-
-  const cbtn = $("confirmStart");
-  cbtn.disabled = true;
-  cbtn.innerHTML = '<span class="spinner"></span>Đang kiểm tra...';
-
-  // Chặn nếu email này đã nộp bài (giới hạn 1 lần/email)
-  if (await isEmailBlocked(email)) {
-    cErr.textContent = "Email này đã làm và nộp bài rồi. Mỗi email chỉ được làm 1 lần.";
-    cbtn.disabled = false; cbtn.innerHTML = "Xác nhận &amp; Bắt đầu";
-    return;
-  }
-
-  cbtn.innerHTML = '<span class="spinner"></span>Đang tải đề...';
-  let prompt;
-  try {
-    prompt = await fetchPrompt(topic);
-  } catch (e) {
-    cErr.textContent = "Không tải được đề bài cho chủ đề này. Thử lại.";
-    cbtn.disabled = false; cbtn.innerHTML = "Xác nhận &amp; Bắt đầu";
-    return;
-  }
-
-  state.name = name;
-  state.email = email;
-  state.topic = topic;
-  state.prompt = prompt;
+// Bước 2: "Xác nhận & Bắt đầu" -> KHÔNG await (đề đã tải sẵn ở bước 1) để requestFullscreen
+// chạy NGAY trong cú click. Nếu await trước đó, trình duyệt sẽ chặn fullscreen.
+$("confirmStart").addEventListener("click", () => {
   state.startedAt = new Date();
 
-  $("whoName").textContent = name;
-  $("promptTopic").textContent = "Chủ đề: " + topic;
-  $("promptText").textContent = prompt;
+  $("whoName").textContent = state.name;
+  $("promptTopic").textContent = "Chủ đề: " + state.topic;
+  $("promptText").textContent = state.prompt;
   $("minWordsHint").textContent = CONFIG.MIN_WORDS > 0
     ? `Tối thiểu ${CONFIG.MIN_WORDS} từ để được nộp` : "Không giới hạn số từ";
 
   $("confirmOverlay").classList.remove("show");
   show("write");
+  enterLockdown();   // requestFullscreen NGAY trong user-gesture (đồng bộ, không await trước)
   startTimer();
-  logEvent(`Bắt đầu làm bài — chủ đề: ${topic}`);
+  logEvent(`Bắt đầu làm bài — chủ đề: ${state.topic}`);
   saveSession();
   $("essay").focus();
-  // Không await: nếu trình duyệt chặn/treo fullscreen, timer & bài làm vẫn chạy bình thường.
-  enterLockdown();
 });
 
 /* ---------- CHẾ ĐỘ KHÓA (FULLSCREEN + CHẶN PHÍM) ---------- */

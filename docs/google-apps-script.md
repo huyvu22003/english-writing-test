@@ -41,7 +41,11 @@ Menu **Tiện ích mở rộng → Apps Script**, xóa code mẫu, dán đoạn 
 const TEACHER_EMAIL = "ieltsmstramy@gmail.com"; // email nhận bài
 const RESULTS_SHEET = "BaiNop";               // tab chứa bài nộp
 const IGNORE_SHEETS = ["BaiNop", "Config"];   // tab KHÔNG phải chủ đề
-const RANDOM_PROMPT = true;                    // true = chọn đề ngẫu nhiên; false = lấy đề dòng đầu
+// Cách phát đề trong 1 chủ đề:
+//  "sequential" = xoay vòng (đề 1,2,3...) -> 2 HS liên tiếp KHÔNG trùng đề (khuyến nghị)
+//  "random"     = bốc ngẫu nhiên (có thể trùng)
+//  "first"      = luôn lấy đề dòng đầu (cả lớp cùng 1 đề)
+const PROMPT_MODE = "sequential";
 
 // ---- Trả danh sách chủ đề + đề bài cho web app (JSONP) ----
 function doGet(e) {
@@ -79,9 +83,32 @@ function getPrompt(topic) {
   const values = sheet.getRange(2, 1, last - 1, 1).getValues()
     .map(r => String(r[0]).trim()).filter(v => v);
   if (!values.length) return "(Chủ đề chưa có đề bài)";
-  return RANDOM_PROMPT
-    ? values[Math.floor(Math.random() * values.length)]
-    : values[0];
+
+  if (PROMPT_MODE === "first") return values[0];
+  if (PROMPT_MODE === "random") return values[Math.floor(Math.random() * values.length)];
+
+  // "sequential": phát đề xoay vòng, có khóa chống 2 HS bấm cùng lúc nhận trùng đề
+  const lock = LockService.getScriptLock();
+  try { lock.waitLock(5000); } catch (e) { /* không lấy được khóa -> tạm random */
+    return values[Math.floor(Math.random() * values.length)];
+  }
+  try {
+    const props = PropertiesService.getScriptProperties();
+    const key = "counter_" + topic;
+    const n = parseInt(props.getProperty(key) || "0", 10);
+    const idx = n % values.length;
+    props.setProperty(key, String(n + 1));
+    return values[idx];
+  } finally {
+    lock.releaseLock();
+  }
+}
+
+// (Tùy chọn) Reset bộ đếm phát đề trước mỗi buổi thi để bắt đầu lại từ đề 1.
+// Chạy hàm này 1 lần trong Apps Script khi muốn làm mới thứ tự phát đề.
+function resetPromptCounters() {
+  PropertiesService.getScriptProperties().deleteAllProperties();
+  Logger.log("Đã reset bộ đếm phát đề. Buổi thi mới sẽ phát lại từ đề 1.");
 }
 
 // ---- Kiểm tra 1 email đã nộp bài chưa (cột C của sheet BaiNop) ----
