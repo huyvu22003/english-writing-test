@@ -436,12 +436,13 @@ function fillTopics(list) {
 }
 
 /* ---------- LẤY ĐỀ BÀI THEO CHỦ ĐỀ ---------- */
-async function fetchPrompt(topic) {
+async function fetchPrompt(topic, who) {
   if (!isConfigured()) {
     const arr = CONFIG.FALLBACK_TOPICS[topic] || ["(Không có đề)"];
     return arr[Math.floor(Math.random() * arr.length)];
   }
-  const res = await jsonp({ action: "prompt", topic });
+  // gửi kèm tên (who) để backend đánh dấu "đề đã dùng" vào cột B của topic
+  const res = await jsonp({ action: "prompt", topic, who: who || "" });
   if (!res || !res.prompt) throw new Error("empty");
   return res.prompt;
 }
@@ -471,21 +472,25 @@ $("startBtn").addEventListener("click", async () => {
     return;
   }
 
-  btn.innerHTML = '<span class="spinner"></span>Đang tải đề...';
-  let prompt;
-  try {
-    prompt = await fetchPrompt(topic);
-  } catch (e) {
-    err.textContent = "Không tải được đề bài cho chủ đề này. Thử lại.";
-    btn.disabled = false; btn.textContent = "Bắt đầu làm bài →";
-    return;
+  // Tải đề (gửi kèm tên để backend đánh dấu "đề đã dùng" vào cột B của topic).
+  // Chỉ tải lại khi đổi chủ đề/email -> tránh đánh dấu trùng nếu bấm lại cùng chủ đề.
+  const fetchKey = topic + "|" + email;
+  if (!(state.prompt && state.fetchedKey === fetchKey)) {
+    btn.innerHTML = '<span class="spinner"></span>Đang tải đề...';
+    try {
+      state.prompt = await fetchPrompt(topic, name);
+      state.fetchedKey = fetchKey;
+    } catch (e) {
+      err.textContent = "Không tải được đề bài cho chủ đề này. Thử lại.";
+      btn.disabled = false; btn.textContent = "Bắt đầu làm bài →";
+      return;
+    }
   }
 
   // Lưu tạm cho bước xác nhận (đề đã tải sẵn -> xác nhận không cần await)
   state.name = name;
   state.email = email;
   state.topic = topic;
-  state.prompt = prompt;
 
   $("cfName").textContent = name;
   $("cfEmail").textContent = email;

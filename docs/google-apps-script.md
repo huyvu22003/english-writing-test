@@ -56,7 +56,7 @@ function doGet(e) {
   if (action === "topics") {
     out = { topics: getTopicNames() };
   } else if (action === "prompt") {
-    out = { prompt: getPrompt(e.parameter.topic) };
+    out = { prompt: getPrompt(e.parameter.topic, e.parameter.who) };
   } else if (action === "check") {
     out = { submitted: isEmailSubmitted(e.parameter.email) };
   } else {
@@ -74,33 +74,45 @@ function getTopicNames() {
     .filter(n => IGNORE_SHEETS.indexOf(n) === -1);
 }
 
-function getPrompt(topic) {
+function getPrompt(topic, who) {
   const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(topic);
   if (!sheet) return "(Không tìm thấy chủ đề: " + topic + ")";
-  // Lấy cột A từ dòng 2 trở xuống, bỏ ô trống
   const last = sheet.getLastRow();
   if (last < 2) return "(Chủ đề chưa có đề bài)";
   const values = sheet.getRange(2, 1, last - 1, 1).getValues()
-    .map(r => String(r[0]).trim()).filter(v => v);
+    .map(function (r) { return String(r[0]).trim(); }).filter(function (v) { return v; });
   if (!values.length) return "(Chủ đề chưa có đề bài)";
 
-  if (PROMPT_MODE === "first") return values[0];
-  if (PROMPT_MODE === "random") return values[Math.floor(Math.random() * values.length)];
-
-  // "sequential": phát đề xoay vòng, có khóa chống 2 HS bấm cùng lúc nhận trùng đề
   const lock = LockService.getScriptLock();
-  try { lock.waitLock(5000); } catch (e) { /* không lấy được khóa -> tạm random */
-    return values[Math.floor(Math.random() * values.length)];
-  }
+  var hasLock = false;
+  try { lock.waitLock(5000); hasLock = true; } catch (e) {}
   try {
-    const props = PropertiesService.getScriptProperties();
-    const key = "counter_" + topic;
-    const n = parseInt(props.getProperty(key) || "0", 10);
-    const idx = n % values.length;
-    props.setProperty(key, String(n + 1));
+    var idx;
+    if (PROMPT_MODE === "first") {
+      idx = 0;
+    } else if (PROMPT_MODE === "random") {
+      idx = Math.floor(Math.random() * values.length);
+    } else { // "sequential": phát đề xoay vòng
+      const props = PropertiesService.getScriptProperties();
+      const key = "counter_" + topic;
+      const n = parseInt(props.getProperty(key) || "0", 10);
+      idx = n % values.length;
+      props.setProperty(key, String(n + 1));
+    }
+
+    // Đánh dấu "đề đã dùng": ghi tên HS vào cột B của dòng đề tương ứng
+    if (who) {
+      if (!String(sheet.getRange(1, 2).getValue()).trim()) {
+        sheet.getRange(1, 2).setValue("Học sinh đã dùng").setFontWeight("bold");
+      }
+      const cell = sheet.getRange(idx + 2, 2);
+      const cur = String(cell.getValue() || "").trim();
+      cell.setValue(cur ? cur + ", " + who : who);
+    }
+
     return values[idx];
   } finally {
-    lock.releaseLock();
+    if (hasLock) lock.releaseLock();
   }
 }
 
