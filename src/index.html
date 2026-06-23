@@ -295,15 +295,24 @@ const CONFIG = {
   // Mật khẩu để giáo viên mở khóa khẩn cấp (Ctrl+Shift+U). ĐỔI mật khẩu này!
   TEACHER_PASSWORD: "IeltsTraMy#2026",
 
-  // Số từ tối thiểu mới cho nộp bài (0 = tắt)
-  MIN_WORDS: 120,
+  // Số từ tối thiểu MẶC ĐỊNH để nộp bài (0 = không giới hạn). Đặt riêng theo topic ở TOPIC_RULES.
+  MIN_WORDS: 0,
 
   // Thời gian làm bài MẶC ĐỊNH (phút), 0 = không giới hạn. Hết giờ tự nộp.
   TIME_LIMIT_MIN: 40,
-  // Thời gian RIÊNG cho từng chủ đề (tên tab phải khớp CHÍNH XÁC). Không liệt kê -> dùng mặc định.
-  TIME_LIMIT_OVERRIDES: {
-    "Reading/Listening": 60,
+
+  // Quy định RIÊNG theo từng topic: time = phút làm bài, minWords = số từ tối thiểu.
+  //  - Khớp tên KHÔNG phân biệt hoa/thường, dấu cách thừa và dấu "/"
+  //    (vd "Reading/Listening" = "reading listening" = "Reading Listening").
+  //  - Topic không liệt kê ở đây -> dùng luật "topic có số" (nếu hợp) hoặc giá trị mặc định.
+  TOPIC_RULES: {
+    "Writing Task 1":    { time: 30, minWords: 150 },
+    "Reading Listening": { time: 60, minWords: 0   }, // trắc nghiệm — yêu cầu riêng bổ sung sau
+    "Luyện đề task 2":   { time: 40, minWords: 250 },
+    "Luyện đề task 1":   { time: 20, minWords: 150 },
   },
+  // "Topic có số" = các tab dạng topic-1, topic-2... : áp dụng khi topic không có luật riêng ở trên.
+  NUMBERED_TOPIC: { time: 60, minWords: 0 },
 
   // Mỗi email chỉ được nộp 1 lần (true = bật). Tắt khi cho luyện tập nhiều lần.
   ONE_SUBMISSION_PER_EMAIL: false,
@@ -375,6 +384,7 @@ const state = {
   submitted: false,
   timerId: null,
   secondsLeft: 0,
+  minWords: 0,        // số từ tối thiểu của topic hiện tại (đặt khi bắt đầu/khôi phục)
 };
 
 function nowStr() {
@@ -516,10 +526,9 @@ $("confirmStart").addEventListener("click", () => {
   $("whoName").textContent = state.name;
   $("promptTopic").textContent = "Chủ đề: " + state.topic;
   $("promptText").textContent = state.prompt;
-  $("minWordsHint").textContent = CONFIG.MIN_WORDS > 0
-    ? `Tối thiểu ${CONFIG.MIN_WORDS} từ để được nộp` : "Không giới hạn số từ";
-
-  state.timeLimitMin = effectiveTimeLimit(state.topic); // 40p mặc định / 60p cho Reading/Listening
+  state.timeLimitMin = effectiveTimeLimit(state.topic); // theo TOPIC_RULES / topic có số / mặc định
+  state.minWords = effectiveMinWords(state.topic);
+  $("minWordsHint").textContent = minWordsHintText();
   $("confirmOverlay").classList.remove("show");
   show("write");
   enterLockdown();   // requestFullscreen NGAY trong user-gesture (đồng bộ, không await trước)
@@ -648,10 +657,9 @@ $("essay").addEventListener("input", () => {
   $("wordCount").textContent = w;
   // Đang hiện cảnh báo thiếu từ mà giờ đã đủ -> trả lại gợi ý bình thường
   const hint = $("minWordsHint");
-  if (hint.classList.contains("warn") && (CONFIG.MIN_WORDS <= 0 || w >= CONFIG.MIN_WORDS)) {
+  if (hint.classList.contains("warn") && (state.minWords <= 0 || w >= state.minWords)) {
     hint.classList.remove("warn");
-    hint.textContent = CONFIG.MIN_WORDS > 0
-      ? `Tối thiểu ${CONFIG.MIN_WORDS} từ để được nộp` : "Không giới hạn số từ";
+    hint.textContent = minWordsHintText();
   }
   saveSession();
 });
@@ -702,8 +710,8 @@ function tryRestore() {
   $("essay").value = data.essay || "";
   $("wordCount").textContent = getWordCount();
   $("violationNum").textContent = state.violations;
-  $("minWordsHint").textContent = CONFIG.MIN_WORDS > 0
-    ? `Tối thiểu ${CONFIG.MIN_WORDS} từ để được nộp` : "Không giới hạn số từ";
+  state.minWords = effectiveMinWords(state.topic);
+  $("minWordsHint").textContent = minWordsHintText();
 
   show("write");
   logEvent("Tải lại trang khi đang làm bài (đã khôi phục)");
@@ -715,12 +723,39 @@ function tryRestore() {
   return true;
 }
 
-/* ---------- ĐỒNG HỒ ---------- */
-// Thời gian (phút) áp dụng cho 1 chủ đề: ngoại lệ nếu có, ngược lại dùng mặc định.
-function effectiveTimeLimit(topic) {
-  const ov = CONFIG.TIME_LIMIT_OVERRIDES || {};
-  return (topic && ov[topic] != null) ? ov[topic] : CONFIG.TIME_LIMIT_MIN;
+/* ---------- QUY ĐỊNH THEO TOPIC (thời gian + số từ tối thiểu) ---------- */
+// Chuẩn hóa tên topic để khớp linh hoạt: bỏ hoa/thường, gộp dấu cách & dấu "/".
+function normTopic(s) { return String(s || "").toLowerCase().replace(/[\/\s]+/g, " ").trim(); }
+// Bảng luật với key đã chuẩn hóa (dựng 1 lần lúc tải).
+const TOPIC_RULES_NORM = {};
+Object.keys(CONFIG.TOPIC_RULES || {}).forEach(function (k) {
+  TOPIC_RULES_NORM[normTopic(k)] = CONFIG.TOPIC_RULES[k];
+});
+// "Topic có số": tên chứa "topic" + chữ số (topic-1, topic 2, Topic_3...).
+function isNumberedTopic(topic) { return /topic[\s_-]*\d+/i.test(topic || ""); }
+// Luật áp dụng cho 1 topic: ưu tiên luật riêng -> luật "topic có số" -> null (dùng mặc định).
+function topicRule(topic) {
+  const r = TOPIC_RULES_NORM[normTopic(topic)];
+  if (r) return r;
+  if (isNumberedTopic(topic)) return CONFIG.NUMBERED_TOPIC || null;
+  return null;
 }
+// Thời gian (phút) áp dụng cho 1 topic; không có luật -> mặc định.
+function effectiveTimeLimit(topic) {
+  const r = topicRule(topic);
+  return (r && r.time != null) ? r.time : CONFIG.TIME_LIMIT_MIN;
+}
+// Số từ tối thiểu áp dụng cho 1 topic; không có luật -> mặc định.
+function effectiveMinWords(topic) {
+  const r = topicRule(topic);
+  return (r && r.minWords != null) ? r.minWords : CONFIG.MIN_WORDS;
+}
+// Gợi ý số từ hiển thị, dùng số từ tối thiểu của topic hiện tại.
+function minWordsHintText() {
+  return state.minWords > 0 ? `Tối thiểu ${state.minWords} từ để được nộp` : "Không giới hạn số từ";
+}
+
+/* ---------- ĐỒNG HỒ ---------- */
 
 function startTimer(resumeSeconds) {
   const limit = (typeof state.timeLimitMin === "number") ? state.timeLimitMin : CONFIG.TIME_LIMIT_MIN;
@@ -751,10 +786,10 @@ $("submitBtn").addEventListener("click", () => doSubmit(false));
 
 async function doSubmit(auto) {
   const words = getWordCount();
-  if (!auto && CONFIG.MIN_WORDS > 0 && words < CONFIG.MIN_WORDS) {
+  if (!auto && state.minWords > 0 && words < state.minWords) {
     // KHÔNG dùng alert (gây blur -> vi phạm giả). Hiện thông báo ngay tại chỗ.
     const hint = $("minWordsHint");
-    hint.textContent = `⚠️ Chưa đủ ${CONFIG.MIN_WORDS} từ — bạn mới viết ${words} từ.`;
+    hint.textContent = `⚠️ Chưa đủ ${state.minWords} từ — bạn mới viết ${words} từ.`;
     hint.classList.add("warn");
     return;
   }

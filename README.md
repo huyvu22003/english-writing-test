@@ -61,11 +61,23 @@ Mở `src/index.html`, sửa khối `CONFIG` ở đầu thẻ `<script>`:
 const CONFIG = {
   ENDPOINT: "https://script.google.com/macros/s/..../exec", // URL backend
   TEACHER_PASSWORD: "doimatkhau123",  // ĐỔI mật khẩu này
-  PROMPT: "Write a short paragraph...", // đề bài
-  MIN_WORDS: 120,        // số từ tối thiểu (0 = tắt)
-  TIME_LIMIT_MIN: 30,    // phút (0 = không giới hạn)
+  MIN_WORDS: 0,          // số từ tối thiểu MẶC ĐỊNH (0 = tắt)
+  TIME_LIMIT_MIN: 40,    // thời gian MẶC ĐỊNH (phút), 0 = không giới hạn
+
+  // Quy định RIÊNG theo từng topic (time = phút, minWords = số từ tối thiểu).
+  // Khớp tên KHÔNG phân biệt hoa/thường, dấu cách thừa và dấu "/".
+  TOPIC_RULES: {
+    "Writing Task 1":    { time: 30, minWords: 150 },
+    "Reading Listening": { time: 60, minWords: 0   },
+    "Luyện đề task 2":   { time: 40, minWords: 250 },
+    "Luyện đề task 1":   { time: 20, minWords: 150 },
+  },
+  // "Topic có số" (topic-1, topic-2...) khi không có luật riêng:
+  NUMBERED_TOPIC: { time: 60, minWords: 0 },
 };
 ```
+
+> 📌 **Số phút & số từ theo topic** lấy theo thứ tự ưu tiên: `TOPIC_RULES` → luật "topic có số" → giá trị mặc định (`TIME_LIMIT_MIN` / `MIN_WORDS`).
 
 ### 3. Chạy thử (local)
 Chỉ cần **mở `src/index.html` bằng trình duyệt** (double-click). Hoặc chạy server tĩnh:
