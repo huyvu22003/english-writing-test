@@ -11,6 +11,10 @@ Mọi thay đổi đáng kể của dự án được ghi tại đây, **mới n
 ## [Chưa phát hành]
 > Việc đang/định làm — xem [`docs/ROADMAP.md`](docs/ROADMAP.md).
 
+### Thêm — Backend vào repo (chống lệch nguồn)
+- Thêm **`backend/Code.gs`** — bản Apps Script **đang chạy thật** (nguồn chuẩn). Trước đây backend chỉ sống trong Google nên repo bị lệch (vd `getPrompt`/`RANDOM_PROMPT` khác bản tài liệu). Từ nay: sửa backend ở `backend/Code.gs` → commit → dán lên Apps Script → deploy.
+- `docs/google-apps-script.md`: thêm chú dẫn trỏ về `backend/Code.gs` là nguồn chuẩn.
+
 ### Thêm — Chế độ trắc nghiệm Reading/Listening (Phase 1)
 - **Frontend** (`src/index.html`): nhận diện topic `RL-…` → vào **chế độ quiz** riêng (tái dùng khóa fullscreen + log vi phạm + đồng hồ giờ thực + lưu/khôi phục).
   - Dạng câu **Phase 1**: chọn 1 (single), chọn nhiều (multi), True/False/NG, điền từ (fill).
