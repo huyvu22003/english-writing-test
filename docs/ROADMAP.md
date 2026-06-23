@@ -4,7 +4,7 @@
 
 ## 🔴 P0 — Toàn vẹn dữ liệu
 1. **Nộp bài "mù" (no-cors) → mất bài thầm lặng.** `sendToBackend()` (~dòng 795) dùng `fetch mode:"no-cors"`; `doSubmit()` luôn báo thành công + `clearSession()` kể cả khi lỗi. → chuyển submit sang JSONP có xác nhận server, retry, chỉ xóa nháp sau khi server xác nhận, backup payload trong localStorage.
-2. **Đồng hồ bị "tạm dừng" khi đóng tab.** `startTimer()` đếm `secondsLeft` chỉ khi trang mở, khôi phục theo `data.secondsLeft`. → tính theo wall-clock: `remaining = limit*60 − (now − startedAt)`.
+2. ✅ **(ĐÃ XONG)** **Đồng hồ bị "tạm dừng" khi đóng tab.** Đã chuyển sang tính theo **giờ thực**: `deadline = startedAt + hạn mức`; đóng tab/reload vẫn trôi giờ; mở lại khi đã quá hạn thì tự nộp ngay.
 3. **Máy dùng chung lộ bài người trước.** `tryRestore()` tự khôi phục bất kỳ session, không kiểm tra danh tính. → hỏi xác nhận / chỉ khôi phục khi email trùng.
 
 ## 🟠 P1 — Chống gian lận
