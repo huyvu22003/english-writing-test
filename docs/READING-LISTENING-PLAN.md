@@ -58,10 +58,10 @@ Mục tiêu: thi thật được với các dạng câu phổ biến nhất.
 - [ ] A6 `[S]` `P1/P2` Bảng quy đổi raw→band (đưa vào script, hoàn thiện ở P2).
 
 ### B. Dữ liệu & nhập đề
-- [ ] B1 `[M]` `P1` Chốt schema tab đề (mục 4).
-- [ ] B2 `[M]` `P1` File Sheet mẫu + đề ví dụ.
-- [ ] B3 `[M]` `P1` Hướng dẫn nhập đề từng dạng.
-- [ ] B4 `[S]` `P1` Quy ước chèn ảnh Reading (link ảnh).
+- [x] B1 `[M]` `P1` Chốt schema tab đề (mục 4). ✅
+- [x] B2 `[M]` `P1` File Sheet mẫu + đề ví dụ → `samples/RL-Reading-01.csv`, `samples/RL-Listening-01.csv`. ✅
+- [x] B3 `[M]` `P1` Hướng dẫn nhập đề từng dạng → `docs/reading-listening-sample.md`. ✅
+- [x] B4 `[S]` `P1` Quy ước chèn ảnh Reading (link ảnh) — trong hướng dẫn mục 6. ✅
 
 ### C. Frontend — khung quiz
 - [ ] C1 `[M]` `P1` Nhận diện topic R/L → vào chế độ trắc nghiệm.

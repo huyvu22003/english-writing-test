@@ -1,0 +1,18 @@
+META,
+loai,reading
+thoiGianPhut,60
+audioURL,
+,
+@PASSAGE 1,
+"The History of Tea
+
+Tea is one of the most widely consumed beverages in the world, second only to water. According to legend, tea was first discovered in China in 2737 BCE, when leaves from a wild tree blew into the Chinese emperor Shen Nung's pot of boiling water. For centuries tea remained an Asian drink, but in the 17th century it was brought to Europe by Dutch and Portuguese traders. In Britain, tea became fashionable during the 1660s and by the 18th century it was a national drink enjoyed by all social classes. Today the largest producers of tea are China and India, while Kenya has become a major exporter in recent decades.",
+,
+@QUESTIONS,
+Part,Mã,Loại,Câu hỏi,Phương án,Đáp án,Điểm,Ảnh
+1,Q1,single,When did tea become fashionable in Britain?,A. 2737 BCE | B. The 1660s | C. The 18th century | D. The 20th century,B,1,
+1,Q2,tfng,Tea was first discovered in India.,,FALSE,1,
+1,Q3,tfng,Kenya is described as a major tea exporter.,,TRUE,1,
+1,Q4,multi,Which TWO countries are named as the largest tea producers today?,A. China | B. Japan | C. India | D. Kenya,"A,C",1,
+1,Q5,fill,Tea is the second most consumed drink in the world after ____.,,water,1,
+1,Q6,single,Who first brought tea to Europe?,A. British traders | B. Indian farmers | C. Dutch and Portuguese traders | D. Kenyan exporters,C,1,

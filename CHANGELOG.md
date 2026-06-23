@@ -15,6 +15,7 @@ Mọi thay đổi đáng kể của dự án được ghi tại đây, **mới n
 - Thêm `docs/ARCHITECTURE.md` (kiến trúc + cơ chế hoạt động chi tiết cho dev mới).
 - Thêm `CHANGELOG.md` (lịch sử thay đổi) và `docs/CONTRIBUTING.md` (quy tắc commit + ghi changelog).
 - Thêm `docs/READING-LISTENING-PLAN.md` (phương án đã chốt cho chế độ trắc nghiệm Reading/Listening: phân phase MVP, checklist, schema Sheet, bảng band IELTS Academic).
+- Thêm `docs/reading-listening-sample.md` (hướng dẫn nhập đề trắc nghiệm cho giáo viên) + file mẫu `samples/RL-Reading-01.csv`, `samples/RL-Listening-01.csv` — hoàn thành B1–B4 (Phase 1).
 
 ---
 
