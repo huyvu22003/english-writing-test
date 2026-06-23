@@ -384,6 +384,7 @@ const state = {
   submitted: false,
   timerId: null,
   secondsLeft: 0,
+  deadline: 0,        // mốc hết giờ (ms) = startedAt + hạn mức; 0 = không giới hạn
   minWords: 0,        // số từ tối thiểu của topic hiện tại (đặt khi bắt đầu/khôi phục)
 };
 
@@ -713,10 +714,18 @@ function tryRestore() {
   state.minWords = effectiveMinWords(state.topic);
   $("minWordsHint").textContent = minWordsHintText();
 
-  show("write");
-  logEvent("Tải lại trang khi đang làm bài (đã khôi phục)");
   state.timeLimitMin = effectiveTimeLimit(state.topic);
-  startTimer(data.secondsLeft);
+  show("write");
+
+  // Tính theo giờ thực: nếu mở lại khi ĐÃ quá hạn -> tự nộp ngay, không vào lại chế độ khóa.
+  if (isTimeUp()) {
+    logEvent("Mở lại khi đã hết giờ — tự động nộp bài");
+    doSubmit(true);
+    return true;
+  }
+
+  logEvent("Tải lại trang khi đang làm bài (đã khôi phục)");
+  startTimer();
   registerViolation("Tải lại / mở lại trang khi đang làm bài");
   $("essay").focus();
   enterLockdown();
@@ -755,24 +764,37 @@ function minWordsHintText() {
   return state.minWords > 0 ? `Tối thiểu ${state.minWords} từ để được nộp` : "Không giới hạn số từ";
 }
 
-/* ---------- ĐỒNG HỒ ---------- */
+/* ---------- ĐỒNG HỒ (tính theo GIỜ THỰC) ---------- */
+// Thời gian còn lại luôn suy ra từ startedAt + hạn mức, KHÔNG đếm lùi nội bộ.
+// Nhờ vậy đóng tab / reload vẫn trôi giờ thật, không "bấm pause" được.
+function currentLimitMin() {
+  return (typeof state.timeLimitMin === "number") ? state.timeLimitMin : CONFIG.TIME_LIMIT_MIN;
+}
+// true nếu topic có giới hạn giờ và đã quá hạn so với thời điểm bắt đầu.
+function isTimeUp() {
+  const limit = currentLimitMin();
+  if (limit <= 0 || !state.startedAt) return false;
+  return Date.now() >= state.startedAt.getTime() + limit * 60 * 1000;
+}
 
-function startTimer(resumeSeconds) {
-  const limit = (typeof state.timeLimitMin === "number") ? state.timeLimitMin : CONFIG.TIME_LIMIT_MIN;
-  if (limit <= 0) { $("timer").textContent = "∞"; return; }
-  state.secondsLeft = (typeof resumeSeconds === "number" && resumeSeconds > 0)
-    ? resumeSeconds : limit * 60;
+function startTimer() {
+  const limit = currentLimitMin();
+  if (limit <= 0) { state.deadline = 0; $("timer").textContent = "∞"; return; } // không giới hạn
+  state.deadline = state.startedAt.getTime() + limit * 60 * 1000;
+  if (tickTimer()) return;                       // đã hết giờ ngay -> tự nộp, khỏi lập interval
+  state.timerId = setInterval(tickTimer, 1000);
+}
+// Cập nhật 1 nhịp; trả true nếu đã hết giờ (và đã kích hoạt tự nộp).
+function tickTimer() {
+  state.secondsLeft = Math.max(0, Math.round((state.deadline - Date.now()) / 1000));
   renderTimer();
-  state.timerId = setInterval(() => {
-    state.secondsLeft--;
-    renderTimer();
-    saveSession(); // lưu nháp định kỳ để khôi phục đúng thời gian còn lại
-    if (state.secondsLeft <= 0) {
-      clearInterval(state.timerId);
-      logEvent("Hết giờ — tự động nộp bài");
-      doSubmit(true);
-    }
-  }, 1000);
+  saveSession(); // lưu nháp định kỳ (mốc startedAt mới là nguồn tính giờ chuẩn)
+  if (state.secondsLeft <= 0) {
+    if (state.timerId) { clearInterval(state.timerId); state.timerId = null; }
+    if (!state.submitted) { logEvent("Hết giờ — tự động nộp bài"); doSubmit(true); }
+    return true;
+  }
+  return false;
 }
 function renderTimer() {
   const m = Math.floor(state.secondsLeft / 60);
