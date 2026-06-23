@@ -1,0 +1,13 @@
+META,
+loai,listening
+thoiGianPhut,
+audioURL,https://drive.google.com/uc?export=download&id=DAN_FILE_ID_VAO_DAY
+raByAudio,true
+,
+@QUESTIONS,
+Part,Mã,Loại,Câu hỏi,Phương án,Đáp án,Điểm,Ảnh
+1,Q1,fill,The booking is for a room on the ____ floor.,,second / 2nd,1,
+1,Q2,single,What time does the library open on Saturday?,A. 8 a.m. | B. 9 a.m. | C. 10 a.m.,C,1,
+1,Q3,tfng,The speaker says the museum is free for students.,,TRUE,1,
+2,Q4,multi,Which TWO facilities are mentioned in the gym?,A. Swimming pool | B. Sauna | C. Tennis court | D. Climbing wall,"B,D",1,
+2,Q5,fill,Members must bring their ____ card to enter.,,membership,1,
