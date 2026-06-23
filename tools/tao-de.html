@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Trình tạo đề trắc nghiệm — IELTS Ms. TRÀ MY</title>
+<style>
+  :root { --bg:#7a2b8f; --accent:#f7941d; --accent-red:#ec3a2b; --line:#e2d6e8; --ok:#1c7c4a; --err:#c0392b; }
+  * { box-sizing: border-box; }
+  body { font-family:-apple-system,"Segoe UI",Roboto,Arial,sans-serif; margin:0; color:#222; background:#f6f2f8; }
+  header { background:var(--bg); color:#fff; padding:18px 24px; }
+  header h1 { margin:0; font-size:20px; }
+  header p { margin:6px 0 0; opacity:.85; font-size:13px; }
+  .wrap { max-width:1100px; margin:0 auto; padding:20px; display:grid; grid-template-columns:1fr; gap:18px; }
+  @media(min-width:980px){ .wrap{ grid-template-columns:1fr 1fr; } .full{ grid-column:1/3; } }
+  .card { background:#fff; border:1px solid var(--line); border-radius:12px; padding:16px 18px; }
+  h2 { font-size:15px; margin:0 0 12px; color:var(--bg); }
+  label { display:block; font-size:13px; font-weight:600; margin:10px 0 4px; }
+  input, select, textarea { width:100%; padding:9px 11px; border:1px solid #cbb9d4; border-radius:8px; font-size:14px; font-family:inherit; }
+  textarea { resize:vertical; line-height:1.5; }
+  .row { display:flex; gap:12px; flex-wrap:wrap; }
+  .row > div { flex:1; min-width:140px; }
+  button { cursor:pointer; border:none; border-radius:8px; font-weight:700; padding:11px 18px; font-size:14px; color:#fff;
+           background:linear-gradient(135deg,var(--accent),var(--accent-red)); }
+  button.ghost { background:#eee; color:#333; }
+  button:disabled { opacity:.5; cursor:not-allowed; }
+  .hint { font-size:12px; color:#666; margin-top:4px; }
+  code, pre { background:#f0eaf3; border-radius:6px; padding:1px 5px; font-size:12.5px; }
+  pre { padding:10px; overflow:auto; white-space:pre-wrap; }
+  .guide { background:#fbf7ee; border:1px solid #f0e2c0; border-radius:8px; padding:12px 14px; font-size:13px; line-height:1.6; }
+  table { width:100%; border-collapse:collapse; font-size:12.5px; margin-top:8px; }
+  th,td { border:1px solid var(--line); padding:5px 7px; text-align:left; vertical-align:top; }
+  th { background:#f3ecf6; }
+  .warns { color:var(--err); font-size:13px; margin-top:8px; white-space:pre-wrap; }
+  .okmsg { color:var(--ok); font-weight:700; }
+  .out-area { width:100%; height:160px; font-family:ui-monospace,Consolas,monospace; font-size:12px; }
+  .pill { display:inline-block; background:#f0eaf3; border-radius:999px; padding:2px 9px; font-size:12px; margin:2px 3px 0 0; }
+</style>
+</head>
+<body>
+<header>
+  <h1>🛠️ Trình tạo đề trắc nghiệm (Reading / Listening)</h1>
+  <p>Điền thông tin + dán câu hỏi ở dạng đơn giản → bấm <b>Tạo nội dung</b> → copy dán thẳng vào Google Sheet. Không cần căn từng ô.</p>
+</header>
+
+<div class="wrap">
+  <!-- ===== Cấu hình đề ===== -->
+  <div class="card">
+    <h2>1. Thông tin đề</h2>
+    <div class="row">
+      <div>
+        <label>Loại</label>
+        <select id="loai">
+          <option value="reading">reading</option>
+          <option value="listening">listening</option>
+        </select>
+      </div>
+      <div>
+        <label>Thời gian (phút)</label>
+        <input id="thoiGian" type="number" value="60" placeholder="60" />
+        <div class="hint">Listening: để trống (hết audio là kết thúc).</div>
+      </div>
+    </div>
+    <div id="audioWrap" style="display:none;">
+      <label>Audio URL (Google Drive, dạng uc?export=download&id=...)</label>
+      <input id="audioURL" type="text" placeholder="https://drive.google.com/uc?export=download&id=FILE_ID" />
+    </div>
+    <label>Tên tab gợi ý (đặt trong Sheet)</label>
+    <input id="tenTab" type="text" value="RL-Reading-01" />
+    <div class="hint">Tên tab BẮT BUỘC bắt đầu bằng <code>RL-</code> thì app mới nhận là bài trắc nghiệm.</div>
+  </div>
+
+  <!-- ===== Hướng dẫn nhanh ===== -->
+  <div class="card">
+    <h2>2. Cách gõ câu hỏi (đọc 30 giây)</h2>
+    <div class="guide">
+      • Mỗi câu cách nhau <b>1 dòng trống</b>.<br>
+      • <b>Trắc nghiệm</b>: ghi câu hỏi, xuống dòng các lựa chọn <code>A) ...</code>, đặt dấu <code>*</code> trước đáp án đúng. Nhiều <code>*</code> = chọn nhiều.<br>
+      • <b>True/False/NG</b> &amp; <b>Điền từ</b>: ghi câu hỏi rồi 1 dòng <code>= đáp án</code>. Nhiều đáp án đúng cho điền từ: ngăn bằng <code>/</code>.<br>
+      • Đổi Part: mở đầu câu bằng <code>[P2]</code>.<br>
+      • Muốn ép loại: <code>[single]/[multi]/[tfng]/[fill]</code> ở đầu câu (thường không cần).
+    </div>
+    <button class="ghost" id="loadEx" style="margin-top:10px;">↧ Điền ví dụ mẫu</button>
+  </div>
+
+  <!-- ===== Đoạn văn (reading) ===== -->
+  <div class="card full" id="passageWrap">
+    <h2>3. Đoạn văn (Reading)</h2>
+    <textarea id="passage" rows="7" placeholder="Dán đoạn văn ở đây. Nhiều passage: ngăn bằng dòng === PASSAGE 2 ==="></textarea>
+  </div>
+
+  <!-- ===== Câu hỏi ===== -->
+  <div class="card full">
+    <h2>4. Câu hỏi</h2>
+    <textarea id="questions" rows="12" placeholder="Dán câu hỏi theo hướng dẫn ở mục 2..."></textarea>
+    <div style="margin-top:12px; display:flex; gap:10px; flex-wrap:wrap;">
+      <button id="gen">⚙️ Tạo nội dung</button>
+      <span id="status"></span>
+    </div>
+    <div class="warns" id="warns"></div>
+  </div>
+
+  <!-- ===== Xem trước ===== -->
+  <div class="card full" id="previewWrap" style="display:none;">
+    <h2>5. Xem trước</h2>
+    <div id="preview"></div>
+  </div>
+
+  <!-- ===== Kết quả ===== -->
+  <div class="card full" id="outWrap" style="display:none;">
+    <h2>6. Lấy nội dung cho Sheet</h2>
+    <div class="guide" style="margin-bottom:10px;">
+      <b>Cách 1 (nhanh nhất):</b> bấm <b>📋 Copy</b> → mở Sheet → tạo tab tên <code id="tabName2">RL-Reading-01</code> → bấm ô <b>A1</b> → dán (Ctrl+V).<br>
+      <b>Cách 2:</b> bấm <b>⬇ Tải CSV</b> → trong Sheet: <i>Tệp → Nhập → Tải lên</i> → chọn <i>Chèn trang tính mới</i>.
+    </div>
+    <div style="display:flex; gap:10px; flex-wrap:wrap; margin-bottom:8px;">
+      <button id="copyBtn">📋 Copy (dán vào ô A1)</button>
+      <button class="ghost" id="csvBtn">⬇ Tải CSV</button>
+    </div>
+    <textarea class="out-area" id="outText" readonly></textarea>
+  </div>
+</div>
+
+<script>
+const $ = function (id) { return document.getElementById(id); };
+function letter(i) { return String.fromCharCode(65 + i); }
+function normTFNGval(v) {
+  var s = String(v || "").toUpperCase().replace(/\s+/g, "");
+  if (["T","TRUE","YES","Y"].indexOf(s) >= 0) return "TRUE";
+  if (["F","FALSE","NO","N"].indexOf(s) >= 0) return "FALSE";
+  if (["NG","NOTGIVEN"].indexOf(s) >= 0) return "NG";
+  return "";
+}
+
+// ---- Bộ phân tích câu hỏi ----
+function parseQuestions(text) {
+  const blocks = String(text || "").replace(/\r/g, "").split(/\n\s*\n/);
+  const out = []; const warns = []; let lastPart = "1"; let qn = 0;
+  blocks.forEach(function (blk) {
+    const lines = blk.split("\n").map(function (s) { return s.trim(); }).filter(Boolean);
+    if (!lines.length) return;
+    let first = lines[0];
+    const pm = first.match(/^\[?\(?\s*p(?:art)?\s*(\d+)\s*\)?\]?\s*/i);
+    let part = lastPart;
+    if (pm) { part = pm[1]; lastPart = part; first = first.slice(pm[0].length).trim(); }
+    let forced = ""; const tm = first.match(/^\[(single|multi|tfng|fill)\]\s*/i);
+    if (tm) { forced = tm[1].toLowerCase(); first = first.slice(tm[0].length).trim(); }
+    first = first.replace(/^\d+[\).]\s*/, "").trim();
+
+    const opts = []; const correct = []; let ansLine = "";
+    for (let i = 1; i < lines.length; i++) {
+      const ln = lines[i];
+      const om = ln.match(/^(\*?)\s*([A-Za-z])[\).]\s*(.+)$/);
+      const am = ln.match(/^=\s*(.+)$/);
+      if (am) { ansLine = am[1].trim(); }
+      else if (om) { if (om[1] === "*") correct.push(opts.length); opts.push(om[3].trim()); }
+      else { first += " " + ln; }
+    }
+
+    qn++; const id = "Q" + qn;
+    let type, options = [], answer = "";
+    if (opts.length) {
+      options = opts.map(function (t, i) { return letter(i) + ". " + t; });
+      if (correct.length) answer = correct.map(letter).join(",");
+      else if (ansLine) answer = ansLine.toUpperCase().replace(/\s+/g, "");
+      type = forced || (answer.indexOf(",") >= 0 ? "multi" : "single");
+      if (!answer) warns.push(id + ": chưa đánh dấu đáp án (đặt * trước phương án đúng).");
+    } else if (ansLine) {
+      const tf = normTFNGval(ansLine);
+      type = forced || (tf ? "tfng" : "fill");
+      answer = (type === "tfng") ? (tf || ansLine.toUpperCase()) : ansLine;
+    } else {
+      type = forced || "fill";
+      warns.push(id + ": thiếu lựa chọn A) B)... hoặc dòng '= đáp án'.");
+    }
+    out.push({ part: part, id: id, type: type, q: first, options: options.join(" | "), answer: answer, diem: 1 });
+  });
+  return { questions: out, warnings: warns };
+}
+
+function splitPassages(text) {
+  if (!String(text || "").trim()) return [];
+  return text.replace(/\r/g, "").split(/^\s*(?:===\s*passage.*?===|@passage.*)\s*$/im)
+    .map(function (s) { return s.trim(); }).filter(Boolean);
+}
+
+// ---- Dựng các hàng dữ liệu cho Sheet ----
+function buildRows() {
+  const loai = $("loai").value;
+  const rows = [];
+  rows.push(["META"]);
+  rows.push(["loai", loai]);
+  const tg = $("thoiGian").value.trim();
+  if (loai === "listening") {
+    if (tg) rows.push(["thoiGianPhut", tg]);
+    rows.push(["audioURL", $("audioURL").value.trim()]);
+    rows.push(["raByAudio", "true"]);
+  } else {
+    rows.push(["thoiGianPhut", tg || "60"]);
+  }
+  if (loai === "reading") {
+    const ps = splitPassages($("passage").value);
+    ps.forEach(function (p, idx) {
+      rows.push(["@PASSAGE " + (idx + 1)]);
+      p.split("\n").forEach(function (ln) { if (ln.trim()) rows.push([ln]); });
+    });
+  }
+  rows.push(["@QUESTIONS"]);
+  rows.push(["Part", "Mã", "Loại", "Câu hỏi", "Phương án", "Đáp án", "Điểm"]);
+  const parsed = parseQuestions($("questions").value);
+  parsed.questions.forEach(function (q) {
+    rows.push([q.part, q.id, q.type, q.q, q.options, q.answer, String(q.diem)]);
+  });
+  return { rows: rows, parsed: parsed };
+}
+
+function esc(s) { return String(s == null ? "" : s).replace(/[&<>]/g, function (c) { return ({ "&":"&amp;","<":"&lt;",">":"&gt;" }[c]); }); }
+function csvCell(s) {
+  s = String(s == null ? "" : s);
+  return /[",\n]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s;
+}
+
+let lastTSV = "", lastCSV = "";
+$("gen").addEventListener("click", function () {
+  const b = buildRows();
+  const qs = b.parsed.questions;
+  // preview
+  let html = "<table><tr><th>Mã</th><th>Part</th><th>Loại</th><th>Câu hỏi</th><th>Phương án</th><th>Đáp án</th></tr>";
+  qs.forEach(function (q) {
+    html += "<tr><td>" + esc(q.id) + "</td><td>" + esc(q.part) + "</td><td>" + esc(q.type) + "</td><td>" + esc(q.q) +
+            "</td><td>" + esc(q.options) + "</td><td><b>" + esc(q.answer) + "</b></td></tr>";
+  });
+  html += "</table>";
+  $("preview").innerHTML = html;
+  $("previewWrap").style.display = "";
+
+  $("warns").textContent = b.parsed.warnings.length ? ("⚠️ Cần sửa:\n- " + b.parsed.warnings.join("\n- ")) : "";
+  $("status").innerHTML = '<span class="okmsg">✅ Đã phân tích ' + qs.length + ' câu' + (b.parsed.warnings.length ? ' (có cảnh báo)' : '') + '</span>';
+
+  lastTSV = b.rows.map(function (r) { return r.join("\t"); }).join("\n");
+  lastCSV = "﻿" + b.rows.map(function (r) { return r.map(csvCell).join(","); }).join("\n");
+  $("outText").value = lastTSV;
+  $("outWrap").style.display = "";
+  $("tabName2").textContent = $("tenTab").value.trim() || "RL-...";
+});
+
+$("copyBtn").addEventListener("click", function () {
+  const ta = $("outText"); ta.focus(); ta.select();
+  const done = function () { $("copyBtn").textContent = "✓ Đã copy!"; setTimeout(function () { $("copyBtn").textContent = "📋 Copy (dán vào ô A1)"; }, 1500); };
+  if (navigator.clipboard) navigator.clipboard.writeText(lastTSV).then(done, function () { document.execCommand("copy"); done(); });
+  else { document.execCommand("copy"); done(); }
+});
+
+$("csvBtn").addEventListener("click", function () {
+  const name = ($("tenTab").value.trim() || "RL-de") + ".csv";
+  const blob = new Blob([lastCSV], { type: "text/csv;charset=utf-8;" });
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob); a.download = name; a.click();
+  setTimeout(function () { URL.revokeObjectURL(a.href); }, 2000);
+});
+
+$("loai").addEventListener("change", function () {
+  const isLs = $("loai").value === "listening";
+  $("audioWrap").style.display = isLs ? "" : "none";
+  $("passageWrap").style.display = isLs ? "none" : "";
+  if (isLs && $("tenTab").value === "RL-Reading-01") $("tenTab").value = "RL-Listening-01";
+});
+
+$("loadEx").addEventListener("click", function () {
+  $("loai").value = "reading"; $("loai").dispatchEvent(new Event("change"));
+  $("thoiGian").value = "60"; $("tenTab").value = "RL-Reading-01";
+  $("passage").value =
+"The History of Tea\n\nTea is one of the most widely consumed beverages in the world, second only to water. According to legend, tea was first discovered in China in 2737 BCE. In the 17th century it was brought to Europe by Dutch and Portuguese traders. In Britain, tea became fashionable during the 1660s. Today the largest producers of tea are China and India, while Kenya has become a major exporter.";
+  $("questions").value =
+"[P1] When did tea become fashionable in Britain?\nA) 2737 BCE\n*B) The 1660s\nC) The 18th century\nD) The 20th century\n\nTea was first discovered in India.\n= FALSE\n\nKenya is described as a major tea exporter.\n= TRUE\n\nWhich TWO countries are the largest tea producers today?\n*A) China\nB) Japan\n*C) India\nD) Kenya\n\nTea is the second most consumed drink in the world after ____.\n= water\n\nWho first brought tea to Europe?\nA) British traders\nB) Indian farmers\n*C) Dutch and Portuguese traders";
+  $("gen").click();
+});
+</script>
+</body>
+</html>
