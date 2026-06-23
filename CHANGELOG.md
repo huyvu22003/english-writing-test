@@ -15,6 +15,10 @@ Mọi thay đổi đáng kể của dự án được ghi tại đây, **mới n
 - Trang web giúp giáo viên **soạn đề không cần căn từng ô Sheet**: điền loại/thời gian/audio, dán đoạn văn, gõ câu hỏi ở **dạng đơn giản** (A) B) C) + dấu `*` cho đáp án đúng; `= TRUE/FALSE/NG`; `= từ / từ` cho điền từ; `[P2]` đổi part).
 - Bấm **Tạo nội dung** → xem trước + cảnh báo câu thiếu đáp án → **Copy dán thẳng ô A1** hoặc **Tải CSV** để import thành tab `RL-…`. Nhận đủ 4 dạng Phase 1.
 
+### Thêm — Backend vào repo (chống lệch nguồn)
+- Thêm **`backend/Code.gs`** — bản Apps Script **đang chạy thật** (nguồn chuẩn). Trước đây backend chỉ sống trong Google nên repo bị lệch (vd `getPrompt`/`RANDOM_PROMPT` khác bản tài liệu). Từ nay: sửa backend ở `backend/Code.gs` → commit → dán lên Apps Script → deploy.
+- `docs/google-apps-script.md`: thêm chú dẫn trỏ về `backend/Code.gs` là nguồn chuẩn.
+
 ### Thêm — Chế độ trắc nghiệm Reading/Listening (Phase 1)
 - **Frontend** (`src/index.html`): nhận diện topic `RL-…` → vào **chế độ quiz** riêng (tái dùng khóa fullscreen + log vi phạm + đồng hồ giờ thực + lưu/khôi phục).
   - Dạng câu **Phase 1**: chọn 1 (single), chọn nhiều (multi), True/False/NG, điền từ (fill).
