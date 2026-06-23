@@ -11,6 +11,14 @@ Mọi thay đổi đáng kể của dự án được ghi tại đây, **mới n
 ## [Chưa phát hành]
 > Việc đang/định làm — xem [`docs/ROADMAP.md`](docs/ROADMAP.md).
 
+### Thêm — Chế độ trắc nghiệm Reading/Listening (Phase 1)
+- **Frontend** (`src/index.html`): nhận diện topic `RL-…` → vào **chế độ quiz** riêng (tái dùng khóa fullscreen + log vi phạm + đồng hồ giờ thực + lưu/khôi phục).
+  - Dạng câu **Phase 1**: chọn 1 (single), chọn nhiều (multi), True/False/NG, điền từ (fill).
+  - Màn làm bài: passage (Reading) / audio (Listening) + thanh **điều hướng câu + tiến độ x/40 + đánh dấu xem lại**.
+  - **Audio Listening**: nghe **1 lần**, **chặn tua**; hết audio → cho `AUDIO_REVIEW_MIN` phút (mặc định 2) rồi tự nộp.
+  - **Chấm + quy đổi band**: online chấm ở backend; offline có **đề DEMO + chấm thử tại máy** (`FALLBACK_QUIZ`). Màn kết quả: điểm thô + band + bảng từng câu đúng/sai.
+- **Backend** (`docs/google-apps-script.md`): thêm code `action=quiz` (trả đề **không kèm đáp án**) + `action=grade` (chấm ở server, lưu `BaiNop-RL`, email GV & HS). ⚠️ **Cần deploy lại** ở tài khoản Google.
+
 ### Tài liệu
 - Thêm `docs/ARCHITECTURE.md` (kiến trúc + cơ chế hoạt động chi tiết cho dev mới).
 - Thêm `CHANGELOG.md` (lịch sử thay đổi) và `docs/CONTRIBUTING.md` (quy tắc commit + ghi changelog).

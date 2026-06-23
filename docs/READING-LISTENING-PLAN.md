@@ -49,13 +49,13 @@ Mục tiêu: thi thật được với các dạng câu phổ biến nhất.
 ## 3. Checklist đầy đủ
 Độ lớn: **S** vài giờ · **M** ~½–1 ngày · **L** nhiều ngày. (P1 = Phase 1, P2 = Phase 2)
 
-### A. Backend Apps Script — ⚠️ phải deploy lại phía Google
-- [ ] A1 `[M]` `P1` Trả đề trắc nghiệm **KHÔNG kèm đáp án**.
-- [ ] A2 `[M]` `P1` **Chấm ở server**: đối chiếu đáp án Sheet → điểm + band + từng câu.
-- [ ] A3 `[S]` `P1` Ghi kết quả vào tab `BaiNop-RL`.
-- [ ] A4 `[S]` `P1` Gửi email kết quả cho **GV + HS**.
+### A. Backend Apps Script — ⚠️ code sẵn trong `google-apps-script.md`, **chờ deploy phía Google**
+- [x] A1 `[M]` `P1` Trả đề trắc nghiệm **KHÔNG kèm đáp án** (`action=quiz`). ✅ *(chờ deploy)*
+- [x] A2 `[M]` `P1` **Chấm ở server** → điểm + band + từng câu (`action=grade`). ✅ *(chờ deploy)*
+- [x] A3 `[S]` `P1` Ghi kết quả vào tab `BaiNop-RL`. ✅ *(chờ deploy)*
+- [x] A4 `[S]` `P1` Gửi email kết quả cho **GV + HS**. ✅ *(chờ deploy)*
 - [ ] A5 `[M]` `P2` Bảng tổng hợp điểm cả lớp tự cập nhật.
-- [ ] A6 `[S]` `P1/P2` Bảng quy đổi raw→band (đưa vào script, hoàn thiện ở P2).
+- [x] A6 `[S]` `P1/P2` Bảng quy đổi raw→band (đã có trong client & backend). ✅
 
 ### B. Dữ liệu & nhập đề
 - [x] B1 `[M]` `P1` Chốt schema tab đề (mục 4). ✅
@@ -64,35 +64,35 @@ Mục tiêu: thi thật được với các dạng câu phổ biến nhất.
 - [x] B4 `[S]` `P1` Quy ước chèn ảnh Reading (link ảnh) — trong hướng dẫn mục 6. ✅
 
 ### C. Frontend — khung quiz
-- [ ] C1 `[M]` `P1` Nhận diện topic R/L → vào chế độ trắc nghiệm.
-- [ ] C2 `[M]` `P1` Tải đề (JSONP) + render passage/đề.
-- [ ] C3 `[M]` `P1` Điều hướng câu + tiến độ x/40 + đánh dấu xem lại + rà trước khi nộp.
-- [ ] C4 `[M]` `P1` Lưu nháp/khôi phục đáp án.
+- [x] C1 `[M]` `P1` Nhận diện topic R/L → vào chế độ trắc nghiệm. ✅
+- [x] C2 `[M]` `P1` Tải đề (JSONP) + render passage/đề. ✅
+- [x] C3 `[M]` `P1` Điều hướng câu + tiến độ x/40 + đánh dấu xem lại + rà trước khi nộp. ✅
+- [x] C4 `[M]` `P1` Lưu nháp/khôi phục đáp án. ✅
 
 ### D. Dạng câu hỏi
-- [ ] D1 `[S]` `P1` Chọn 1 (A/B/C/D), số phương án thay đổi theo câu.
-- [ ] D2 `[S]` `P1` Chọn nhiều (2–3).
-- [ ] D3 `[S]` `P1` True/False/Not Given.
-- [ ] D4 `[M]` `P1` Điền từ/đáp án ngắn (chuẩn hóa + nhiều đáp án đúng).
+- [x] D1 `[S]` `P1` Chọn 1 (A/B/C/D), số phương án thay đổi theo câu. ✅
+- [x] D2 `[S]` `P1` Chọn nhiều (2–3). ✅
+- [x] D3 `[S]` `P1` True/False/Not Given. ✅
+- [x] D4 `[M]` `P1` Điền từ/đáp án ngắn (chuẩn hóa + nhiều đáp án đúng). ✅
 - [ ] D5 `[M]` `P2` Nối (matching).
 - [ ] D6 `[L]` `P2` Hoàn thành câu/bảng/sơ đồ/ghi chú.
 
 ### E. Audio
-- [ ] E1 `[M]` `P1` Phát ẩn seek, nghe 1 lần, chặn tua.
-- [ ] E2 `[S]` `P1` Hết audio → 2 phút rà → tự nộp (cấu hình được).
-- [ ] E3 `[S]` `P1` Lấy audio từ Google Drive (link tải trực tiếp).
+- [x] E1 `[M]` `P1` Phát ẩn seek, nghe 1 lần, chặn tua. ✅
+- [x] E2 `[S]` `P1` Hết audio → 2 phút rà → tự nộp (cấu hình `AUDIO_REVIEW_MIN`). ✅
+- [x] E3 `[S]` `P1` Lấy audio từ Google Drive (link tải trực tiếp). ✅
 
 ### F. Chống gian lận bổ sung
 - [ ] F1 `[M]` `P2` Xáo thứ tự đáp án + ánh xạ lại khi chấm.
-- [ ] F2 `[S]` `P1` Tái dùng khóa fullscreen + log cho quiz.
+- [x] F2 `[S]` `P1` Tái dùng khóa fullscreen + log cho quiz. ✅
 
 ### G. Kết quả
-- [ ] G1 `[M]` `P1` Màn kết quả: điểm + band + bảng từng câu đúng/sai.
+- [x] G1 `[M]` `P1` Màn kết quả: điểm + band + bảng từng câu đúng/sai. ✅
 
 ### H. Tài liệu, kiểm thử, triển khai
-- [ ] H1 `[S]` `P1` Cập nhật ARCHITECTURE/CHANGELOG/README.
-- [ ] H2 `[M]` `P1` Test offline (FALLBACK) + test thật sau deploy.
-- [ ] H3 `[S]` `P1` Hướng dẫn GV deploy lại Apps Script.
+- [x] H1 `[S]` `P1` Cập nhật ARCHITECTURE/CHANGELOG/README. ✅
+- [~] H2 `[M]` `P1` Test offline (FALLBACK) ✅ + test thật sau deploy (chờ deploy).
+- [x] H3 `[S]` `P1` Hướng dẫn GV deploy lại Apps Script (trong google-apps-script.md). ✅
 
 ---
 
