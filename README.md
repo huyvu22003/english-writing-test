@@ -4,6 +4,15 @@
 >
 > Ngày tạo: 2026-06-17
 
+## 📚 Tài liệu cho dev (đọc theo thứ tự)
+| File | Nội dung |
+|---|---|
+| [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) | Ý tưởng ban đầu → kiến trúc → cơ chế hoạt động chi tiết (đọc đầu tiên) |
+| [`CHANGELOG.md`](CHANGELOG.md) | Lịch sử thay đổi theo thời gian thực |
+| [`docs/CONTRIBUTING.md`](docs/CONTRIBUTING.md) | **Quy tắc commit + ghi log thay đổi** (bắt buộc tuân theo) |
+| [`docs/ROADMAP.md`](docs/ROADMAP.md) | Việc cần làm tiếp (P0…P3) |
+| [`docs/deployment.md`](docs/deployment.md) · [`docs/google-apps-script.md`](docs/google-apps-script.md) | Triển khai frontend / backend |
+
 ## ✨ Tính năng
 - **Đa chủ đề từ Google Sheet**: mỗi tab = 1 chủ đề, học sinh chọn chủ đề → app tự tải đề tương ứng (chọn ngẫu nhiên nếu chủ đề có nhiều đề). Giáo viên chỉ cần gõ đề vào Sheet, không đụng code.
 - Bài nộp **đính kèm nguyên văn đề bài** để giáo viên đối chiếu.
