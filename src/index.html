@@ -298,8 +298,12 @@ const CONFIG = {
   // Số từ tối thiểu mới cho nộp bài (0 = tắt)
   MIN_WORDS: 120,
 
-  // Thời gian làm bài, tính bằng phút (0 = không giới hạn). Hết giờ tự nộp.
-  TIME_LIMIT_MIN: 60,
+  // Thời gian làm bài MẶC ĐỊNH (phút), 0 = không giới hạn. Hết giờ tự nộp.
+  TIME_LIMIT_MIN: 40,
+  // Thời gian RIÊNG cho từng chủ đề (tên tab phải khớp CHÍNH XÁC). Không liệt kê -> dùng mặc định.
+  TIME_LIMIT_OVERRIDES: {
+    "Reading/Listening": 60,
+  },
 
   // Mỗi email chỉ được nộp 1 lần (true = bật). Tắt khi cho luyện tập nhiều lần.
   ONE_SUBMISSION_PER_EMAIL: false,
@@ -515,6 +519,7 @@ $("confirmStart").addEventListener("click", () => {
   $("minWordsHint").textContent = CONFIG.MIN_WORDS > 0
     ? `Tối thiểu ${CONFIG.MIN_WORDS} từ để được nộp` : "Không giới hạn số từ";
 
+  state.timeLimitMin = effectiveTimeLimit(state.topic); // 40p mặc định / 60p cho Reading/Listening
   $("confirmOverlay").classList.remove("show");
   show("write");
   enterLockdown();   // requestFullscreen NGAY trong user-gesture (đồng bộ, không await trước)
@@ -702,6 +707,7 @@ function tryRestore() {
 
   show("write");
   logEvent("Tải lại trang khi đang làm bài (đã khôi phục)");
+  state.timeLimitMin = effectiveTimeLimit(state.topic);
   startTimer(data.secondsLeft);
   registerViolation("Tải lại / mở lại trang khi đang làm bài");
   $("essay").focus();
@@ -710,10 +716,17 @@ function tryRestore() {
 }
 
 /* ---------- ĐỒNG HỒ ---------- */
+// Thời gian (phút) áp dụng cho 1 chủ đề: ngoại lệ nếu có, ngược lại dùng mặc định.
+function effectiveTimeLimit(topic) {
+  const ov = CONFIG.TIME_LIMIT_OVERRIDES || {};
+  return (topic && ov[topic] != null) ? ov[topic] : CONFIG.TIME_LIMIT_MIN;
+}
+
 function startTimer(resumeSeconds) {
-  if (CONFIG.TIME_LIMIT_MIN <= 0) { $("timer").textContent = "∞"; return; }
+  const limit = (typeof state.timeLimitMin === "number") ? state.timeLimitMin : CONFIG.TIME_LIMIT_MIN;
+  if (limit <= 0) { $("timer").textContent = "∞"; return; }
   state.secondsLeft = (typeof resumeSeconds === "number" && resumeSeconds > 0)
-    ? resumeSeconds : CONFIG.TIME_LIMIT_MIN * 60;
+    ? resumeSeconds : limit * 60;
   renderTimer();
   state.timerId = setInterval(() => {
     state.secondsLeft--;
