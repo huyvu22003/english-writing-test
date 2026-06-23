@@ -14,6 +14,7 @@ Mọi thay đổi đáng kể của dự án được ghi tại đây, **mới n
 ### Tài liệu
 - Thêm `docs/ARCHITECTURE.md` (kiến trúc + cơ chế hoạt động chi tiết cho dev mới).
 - Thêm `CHANGELOG.md` (lịch sử thay đổi) và `docs/CONTRIBUTING.md` (quy tắc commit + ghi changelog).
+- Thêm `docs/READING-LISTENING-PLAN.md` (phương án đã chốt cho chế độ trắc nghiệm Reading/Listening: phân phase MVP, checklist, schema Sheet, bảng band IELTS Academic).
 
 ---
 
