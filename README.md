@@ -12,6 +12,7 @@
 | [`docs/CONTRIBUTING.md`](docs/CONTRIBUTING.md) | **Quy tắc commit + ghi log thay đổi** (bắt buộc tuân theo) |
 | [`docs/ROADMAP.md`](docs/ROADMAP.md) | Việc cần làm tiếp (P0…P3) |
 | [`docs/deployment.md`](docs/deployment.md) · [`docs/google-apps-script.md`](docs/google-apps-script.md) | Triển khai frontend / backend |
+| [`tools/tao-de.html`](tools/tao-de.html) | 🛠️ Trình tạo đề trắc nghiệm (gõ đề đơn giản → ra nội dung dán vào Sheet) |
 
 ## ✨ Tính năng
 - **Đa chủ đề từ Google Sheet**: mỗi tab = 1 chủ đề, học sinh chọn chủ đề → app tự tải đề tương ứng (chọn ngẫu nhiên nếu chủ đề có nhiều đề). Giáo viên chỉ cần gõ đề vào Sheet, không đụng code.

@@ -6,6 +6,11 @@
 
 ---
 
+## ⭐ Cách DỄ NHẤT: dùng "Trình tạo đề"
+Mở **[`tools/tao-de.html`](../tools/tao-de.html)** (mở bằng trình duyệt) → điền thông tin + dán câu hỏi ở dạng đơn giản → bấm **Tạo nội dung** → **Copy dán vào ô A1** của tab `RL-…` (hoặc tải CSV). Khỏi phải tự căn cột theo schema bên dưới.
+
+> Phần dưới đây mô tả schema gốc (để hiểu/đối chiếu); nếu dùng trình tạo đề thì không cần nhớ.
+
 ## 0. Quy tắc chung (đọc trước)
 
 - **1 đề = 1 tab.** Đặt tên tab bắt đầu bằng `RL-` để app hiểu đây là bài trắc nghiệm:
